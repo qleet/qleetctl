@@ -50,8 +50,8 @@ var installCmd = &cobra.Command{
 			panic(err)
 		}
 		defer apiDepsManifest.Close()
-		apiDepsManifest.WriteString(install.APIDepsManifest)
-		fmt.Println("QleetOS API dependencies written to /tmp directory")
+		apiDepsManifest.WriteString(install.APIDepsManifest())
+		fmt.Println("QleetOS API dependencies manifest written to /tmp directory")
 
 		// install API dependencies on kind cluster
 		fmt.Println("installing QleetOS API dependencies")
@@ -70,7 +70,7 @@ var installCmd = &cobra.Command{
 			"configmap",
 			"postgres-config-data",
 			"-n",
-			"threeport-api",
+			install.ThreeportControlPlaneNs,
 		)
 		if err := psqlConfigCreate.Run(); err != nil {
 			panic(err)
@@ -84,8 +84,8 @@ var installCmd = &cobra.Command{
 			panic(err)
 		}
 		defer apiServerManifest.Close()
-		apiServerManifest.WriteString(install.APIServerManifest)
-		fmt.Println("QleetOS API server written to /tmp directory")
+		apiServerManifest.WriteString(install.APIServerManifest())
+		fmt.Println("QleetOS API server manifest written to /tmp directory")
 
 		// install QleetOS API
 		fmt.Println("installing QleetOS API server")
@@ -100,6 +100,29 @@ var installCmd = &cobra.Command{
 		}
 
 		fmt.Println("QleetOS API server created")
+
+		// write workload controller manifest to /tmp directory
+		workloadControllerManifest, err := os.Create(install.WorkloadControllerManifestPath)
+		if err != nil {
+			panic(err)
+		}
+		defer workloadControllerManifest.Close()
+		workloadControllerManifest.WriteString(install.WorkloadControllerManifest())
+		fmt.Println("QleetOS workload controller manifest written to /tmp directory")
+
+		// install workload controller
+		fmt.Println("installing QleetOS workload controller")
+		workloadControllerCreate := exec.Command(
+			"kubectl",
+			"apply",
+			"-f",
+			install.WorkloadControllerManifestPath,
+		)
+		if err := workloadControllerCreate.Run(); err != nil {
+			panic(err)
+		}
+
+		fmt.Println("QleetOS workload controller created")
 	},
 }
 

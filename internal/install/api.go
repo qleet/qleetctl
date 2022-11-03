@@ -1,21 +1,29 @@
 package install
 
+import "fmt"
+
 const (
-	APIDepsManifestPath   = "/tmp/qleet-api-deps-manifest.yaml"
-	APIServerManifestPath = "/tmp/qleet-api-server-manifest.yaml"
-	APIDepsManifest       = `---
+	ThreeportControlPlaneNs = "threeport-control-plane"
+	APIDepsManifestPath     = "/tmp/qleet-api-deps-manifest.yaml"
+	APIServerManifestPath   = "/tmp/qleet-api-server-manifest.yaml"
+)
+
+// APIDepsManifest returns a yaml manifest for the threeport API dependencies
+// with the namespace included.
+func APIDepsManifest() string {
+	return fmt.Sprintf(`---
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: threeport-api
+  name: %[1]s
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: postgres-config
-  namespace: threeport-api
+  name: threeport-api-db-config
+  namespace: %[1]s
   labels:
-    app: postgres
+    app: threeport-api-db
 data:
   POSTGRES_DB: threeport_api
   POSTGRES_USER: tp_rest_api
@@ -24,17 +32,17 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres
-  namespace: threeport-api
+  name: threeport-api-db
+  namespace: %[1]s
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: postgres
+      app: threeport-api-db
   template:
     metadata:
       labels:
-        app: postgres
+        app: threeport-api-db
     spec:
       containers:
         - name: postgres
@@ -44,7 +52,7 @@ spec:
             - containerPort: 5432
           envFrom:
             - configMapRef:
-                name: postgres-config
+                name: threeport-api-db-config
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgredb
@@ -60,26 +68,26 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres
-  namespace: threeport-api
+  name: threeport-api-db
+  namespace: %[1]s
   labels:
-    app: postgres
+    app: threeport-api-db
 spec:
   ports:
    - port: 5432
   selector:
-   app: postgres
+   app: threeport-api-db
 ---
 # Source: nats/templates/pdb.yaml
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: nats-js
-  namespace: threeport-api
+  name: threeport-message-broker
+  namespace: %[1]s
   labels:
     helm.sh/chart: nats-0.18.2
     app.kubernetes.io/name: nats
-    app.kubernetes.io/instance: nats-js
+    app.kubernetes.io/instance: threeport-message-broker
     app.kubernetes.io/version: "2.9.3"
     app.kubernetes.io/managed-by: Helm
 spec:
@@ -87,18 +95,18 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: nats
-      app.kubernetes.io/instance: nats-js
+      app.kubernetes.io/instance: threeport-message-broker
 ---
 # Source: nats/templates/rbac.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: nats-js
-  namespace: threeport-api
+  name: threeport-message-broker
+  namespace: %[1]s
   labels:
     helm.sh/chart: nats-0.18.2
     app.kubernetes.io/name: nats
-    app.kubernetes.io/instance: nats-js
+    app.kubernetes.io/instance: threeport-message-broker
     app.kubernetes.io/version: "2.9.3"
     app.kubernetes.io/managed-by: Helm
 ---
@@ -106,12 +114,12 @@ metadata:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: nats-js-config
-  namespace: threeport-api
+  name: threeport-message-broker-config
+  namespace: %[1]s
   labels:
     helm.sh/chart: nats-0.18.2
     app.kubernetes.io/name: nats
-    app.kubernetes.io/instance: nats-js
+    app.kubernetes.io/instance: threeport-message-broker
     app.kubernetes.io/version: "2.9.3"
     app.kubernetes.io/managed-by: Helm
 data:
@@ -144,18 +152,18 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: nats-js
-  namespace: threeport-api
+  name: threeport-message-broker
+  namespace: %[1]s
   labels:
     helm.sh/chart: nats-0.18.2
     app.kubernetes.io/name: nats
-    app.kubernetes.io/instance: nats-js
+    app.kubernetes.io/instance: threeport-message-broker
     app.kubernetes.io/version: "2.9.3"
     app.kubernetes.io/managed-by: Helm
 spec:
   selector:
     app.kubernetes.io/name: nats
-    app.kubernetes.io/instance: nats-js
+    app.kubernetes.io/instance: threeport-message-broker
   clusterIP: None
   publishNotReadyAddresses: true
   ports:
@@ -182,20 +190,20 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nats-js-box
-  namespace: threeport-api
+  name: threeport-message-broker-box
+  namespace: %[1]s
   labels:
-    app: nats-js-box
+    app: threeport-message-broker-box
     chart: nats-0.18.2
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: nats-js-box
+      app: threeport-message-broker-box
   template:
     metadata:
       labels:
-        app: nats-js-box
+        app: threeport-message-broker-box
     spec:
       volumes:
       containers:
@@ -206,7 +214,7 @@ spec:
           null
         env:
         - name: NATS_URL
-          value: nats-js
+          value: threeport-message-broker
         command:
         - "tail"
         - "-f"
@@ -217,21 +225,21 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: nats-js
-  namespace: threeport-api
+  name: threeport-message-broker
+  namespace: %[1]s
   labels:
     helm.sh/chart: nats-0.18.2
     app.kubernetes.io/name: nats
-    app.kubernetes.io/instance: nats-js
+    app.kubernetes.io/instance: threeport-message-broker
     app.kubernetes.io/version: "2.9.3"
     app.kubernetes.io/managed-by: Helm
 spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: nats
-      app.kubernetes.io/instance: nats-js
+      app.kubernetes.io/instance: threeport-message-broker
   replicas: 1
-  serviceName: nats-js
+  serviceName: threeport-message-broker
 
   podManagementPolicy: Parallel
 
@@ -244,13 +252,13 @@ spec:
         checksum/config: 3b398e973c292bf8c2eb90d62acb846274c0489643aad560d8c4aed123f20ce7
       labels:
         app.kubernetes.io/name: nats
-        app.kubernetes.io/instance: nats-js
+        app.kubernetes.io/instance: threeport-message-broker
     spec:
       # Common volumes for the containers.
       volumes:
       - name: config-volume
         configMap:
-          name: nats-js-config
+          name: threeport-message-broker-config
 
       # Local volume shared with the reloader.
       - name: pid
@@ -262,7 +270,7 @@ spec:
       #               #
       #################
 
-      serviceAccountName: nats-js
+      serviceAccountName: threeport-message-broker
 
       # Required to be able to HUP signal and apply config
       # reload to the server without restarting the pod.
@@ -308,13 +316,12 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         - name: CLUSTER_ADVERTISE
-          value: $(POD_NAME).nats-js.$(POD_NAMESPACE).svc.cluster.local
+          value: $(POD_NAME).threeport-message-broker.$(POD_NAMESPACE).svc.cluster.local
         volumeMounts:
         - name: config-volume
           mountPath: /etc/nats-config
         - name: pid
           mountPath: /var/run/nats
-        
 
         #######################
         #                     #
@@ -385,7 +392,6 @@ spec:
           mountPath: /etc/nats-config
         - name: pid
           mountPath: /var/run/nats
-        
 
       ##############################
       #                            #
@@ -416,10 +422,11 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "nats-js-test-request-reply"
+  name: "threeport-message-broker-test-request-reply"
+  namespace: %[1]s
   labels:
     chart: nats-0.18.2
-    app: nats-js-test-request-reply
+    app: threeport-message-broker-test-request-reply
   annotations:
     "helm.sh/hook": test
 spec:
@@ -428,7 +435,7 @@ spec:
     image: synadia/nats-box
     env:
     - name: NATS_HOST
-      value: nats-js
+      value: threeport-message-broker
     command:
     - /bin/sh
     - -ec
@@ -444,29 +451,34 @@ spec:
       [ $name = test ]
 
   restartPolicy: Never
-`
-	APIServerManifest = `---
+`, ThreeportControlPlaneNs)
+}
+
+// APIServerManifest returns a yaml manifest for the threeport API with the
+// namespace included.
+func APIServerManifest() string {
+	return fmt.Sprintf(`---
 apiVersion: v1
 kind: Secret
 metadata:
   name: db-config
-  namespace: threeport-api
+  namespace: %[1]s
 stringData:
   env: |
-    DB_HOST=postgres
+    DB_HOST=threeport-api-db
     DB_USER=tp_rest_api
     DB_PASSWORD=tp-rest-api-pwd
     DB_NAME=threeport_api
     DB_PORT=5432
     DB_SSL_MODE=disable
-    NATS_HOST=nats-js
+    NATS_HOST=threeport-message-broker
     NATS_PORT=4222
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: threeport-api-server
-  namespace: threeport-api
+  namespace: %[1]s
 spec:
   replicas: 1
   selector:
@@ -483,6 +495,7 @@ spec:
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 1323
+          hostPort: 1323
           name: http
           protocol: TCP
         volumeMounts:
@@ -497,7 +510,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: threeport-api-server
-  namespace: threeport-api
+  namespace: %[1]s
 spec:
   selector:
     app.kubernetes.io/name: threeport-api-server
@@ -506,5 +519,5 @@ spec:
     port: 80
     protocol: TCP
     targetPort: 1323
-`
-)
+`, ThreeportControlPlaneNs)
+}

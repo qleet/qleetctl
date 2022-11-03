@@ -14,6 +14,9 @@ name: %s
 nodes:
 - role: control-plane
 - role: worker
-- role: worker
+  extraPortMappings:
+    - containerPort: 1323
+      hostPort: 1323
+      protocol: TCP
 `, QleetKindClusterName)
 }
