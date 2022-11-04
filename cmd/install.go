@@ -5,14 +5,18 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
-
-	"github.com/spf13/cobra"
+	"time"
 
 	"github.com/qleet/qleetctl/internal/install"
 	"github.com/qleet/qleetctl/internal/provider"
+	"github.com/spf13/cobra"
+	tpclient "github.com/threeport/threeport-go-client"
+	tpapi "github.com/threeport/threeport-rest-api/pkg/api"
+	kubeclient "k8s.io/client-go/tools/clientcmd"
 )
 
 // installCmd represents the install command
@@ -123,6 +127,79 @@ var installCmd = &cobra.Command{
 		}
 
 		fmt.Println("QleetOS workload controller created")
+
+		// wait a few seconds for everything to come up
+		fmt.Println("waiting for components to spin up...")
+		time.Sleep(time.Second * 100)
+
+		// get kubeconfig
+		defaultLoadRules := kubeclient.NewDefaultClientConfigLoadingRules()
+
+		clientConfigLoadRules, err := defaultLoadRules.Load()
+		if err != nil {
+			panic(err)
+		}
+
+		clientConfig := kubeclient.NewDefaultClientConfig(*clientConfigLoadRules, &kubeclient.ConfigOverrides{})
+		kubeConfig, err := clientConfig.RawConfig()
+		if err != nil {
+			panic(err)
+		}
+
+		// get cluster CA and server endpoint
+		var caCert string
+		clusterFound := false
+		for clusterName, cluster := range kubeConfig.Clusters {
+			if clusterName == kubeConfig.CurrentContext {
+				caCert = string(cluster.CertificateAuthorityData)
+				clusterFound = true
+			}
+		}
+		if !clusterFound {
+			fmt.Println("kubeconfig cluster for qleet-os not found")
+			os.Exit(1)
+		}
+
+		// get client certificate and key
+		var cert string
+		var key string
+		userFound := false
+		for userName, user := range kubeConfig.AuthInfos {
+			if userName == kubeConfig.CurrentContext {
+				cert = string(user.ClientCertificateData)
+				key = string(user.ClientKeyData)
+				userFound = true
+			}
+		}
+		if !userFound {
+			fmt.Println("kubeconfig user for qleet-os not found")
+			os.Exit(1)
+		}
+
+		// setup default compute space cluster
+		clusterName := "default-qleet-compute-space"
+		clusterRegion := "local"
+		clusterProvider := "kind"
+		server := "kubernetes.default"
+		workloadCluster := tpapi.WorkloadCluster{
+			Name:          &clusterName,
+			Region:        &clusterRegion,
+			Provider:      &clusterProvider,
+			APIEndpoint:   &server,
+			CACertificate: &caCert,
+			Certificate:   &cert,
+			Key:           &key,
+		}
+		wcJSON, err := json.Marshal(&workloadCluster)
+		if err != nil {
+			panic(err)
+		}
+		wc, err := tpclient.CreateWorkloadCluster(wcJSON, "http://localhost:1323", "")
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Printf("default workload cluster %s for compute space set up\n", *wc.Name)
 	},
 }
 
