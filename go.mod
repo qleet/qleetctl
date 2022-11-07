@@ -1,15 +1,11 @@
 module github.com/qleet/qleetctl
 
-replace github.com/threeport/threeport-rest-api => /home/lander2k2/Projects/src/github.com/threeport/threeport-rest-api
-
-replace github.com/threeport/threeport-go-client => /home/lander2k2/Projects/src/github.com/threeport/threeport-go-client
-
 go 1.19
 
 require (
 	github.com/spf13/cobra v1.6.1
-	github.com/threeport/threeport-go-client v0.0.0-00010101000000-000000000000
-	github.com/threeport/threeport-rest-api v1.0.1
+	github.com/threeport/threeport-go-client v1.0.4
+	github.com/threeport/threeport-rest-api v1.0.2
 	k8s.io/client-go v0.25.3
 )
 
@@ -39,8 +35,8 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/datatypes v1.0.7 // indirect
-	gorm.io/driver/mysql v1.3.2 // indirect
-	gorm.io/gorm v1.24.1-0.20221019064659-5dd2bb482755 // indirect
+	gorm.io/driver/mysql v1.4.3 // indirect
+	gorm.io/gorm v1.24.1 // indirect
 	k8s.io/apimachinery v0.25.3 // indirect
 	k8s.io/klog/v2 v2.70.1 // indirect
 	k8s.io/utils v0.0.0-20220728103510-ee6ede2d64ed // indirect
