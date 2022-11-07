@@ -7,6 +7,7 @@ help:
 
 #build: @ Build workload controller binary
 build:
+	go generate
 	@export GOFLAGS=$(GOFLAGS); export CGO_ENABLED=0; go build -a -o qleetctl main.go
 
 #install: @ Install the qleetctl CLI
