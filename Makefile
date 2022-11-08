@@ -13,6 +13,7 @@ help:
 
 #test: @ Run tests
 test:
+	@go generate
 	@export GOPRIVATE=$(GOPRIVATE); export GOFLAGS=$(GOFLAGS); go test $(go list ./... | grep -v /internal/setup)
 
 #build: @ Build workload controller binary
