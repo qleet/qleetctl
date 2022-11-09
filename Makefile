@@ -33,8 +33,7 @@ install: build
 release: build
 	$(eval NT=$(NEWTAG))
 	@echo -n "Are you sure to create and push ${NT} tag? [y/N] " && read ans && [ $${ans:-N} = y ]
-	@git commit -s -m "Cut ${NT} release"
-	@git tag ${NT}
+	@git tag -a -m "Cut ${NT} release" ${NT}
 	@git push origin ${NT}
 	@git push
 	@echo "Done."
