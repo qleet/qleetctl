@@ -74,7 +74,10 @@ brews:
     skip_upload: auto
 
     # Packages your package depends on.
-    # dependencies:
+    dependencies:
+      - name: kubectl
+      - name: kind
+
 
     install: |-
       bin.install "qleetctl"
