@@ -39,6 +39,10 @@ release: build
 	@git push
 	@echo "Done."
 
+#test-release-local: @ Build binaries locally without publishing
+test-release-local: build
+	goreleaser release --rm-dist --snapshot
+
 #update: @ Update dependencies to latest versions
 update:
 	@export GOPRIVATE=$(GOPRIVATE); export GOFLAGS=$(GOFLAGS); go get -u; go mod tidy

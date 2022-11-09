@@ -6,7 +6,7 @@ package main
 
 import "github.com/qleet/qleetctl/cmd"
 
-//go:generate bash get_version.sh
+//go:generate bash -c "./get_version.sh"
 func main() {
 	cmd.Execute()
 }

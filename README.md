@@ -56,3 +56,20 @@ Remove the QleetOS control plane:
 ```bash
 qleetctl uninstall
 ```
+
+### Help
+
+```text
+$ make
+Usage: make COMMAND
+Commands :
+help                - List available tasks
+test                - Run tests
+build               - Build workload controller binary
+get                 - Download and install dependency packages
+install             - Install the qleetctl CLI
+release             - Create and push a new tag
+test-release-local  - Build binaries locally without publishing
+update              - Update dependencies to latest versions
+version             - Print current version(tag)
+```
