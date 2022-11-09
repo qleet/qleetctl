@@ -130,7 +130,7 @@ var installCmd = &cobra.Command{
 
 		// wait a few seconds for everything to come up
 		fmt.Println("waiting for components to spin up...")
-		time.Sleep(time.Second * 100)
+		time.Sleep(time.Second * 200)
 
 		// get kubeconfig
 		defaultLoadRules := kubeclient.NewDefaultClientConfigLoadingRules()
