@@ -37,7 +37,7 @@ changelog:
       - '^chore(\(.*\))?:'
       - '^build(\(.*\))?:'
 brews:
-  - name: qleetpctl
+  - name: qleetctl
     tap:
       owner: qleet
       name: homebrew-tap
