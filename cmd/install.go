@@ -11,12 +11,13 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/qleet/qleetctl/internal/install"
-	"github.com/qleet/qleetctl/internal/provider"
 	"github.com/spf13/cobra"
 	tpclient "github.com/threeport/threeport-go-client"
 	tpapi "github.com/threeport/threeport-rest-api/pkg/api"
 	kubeclient "k8s.io/client-go/tools/clientcmd"
+
+	"github.com/qleet/qleetctl/internal/install"
+	"github.com/qleet/qleetctl/internal/provider"
 )
 
 // installCmd represents the install command

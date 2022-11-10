@@ -8,8 +8,9 @@ import (
 	"fmt"
 	"os/exec"
 
-	"github.com/qleet/qleetctl/internal/provider"
 	"github.com/spf13/cobra"
+
+	"github.com/qleet/qleetctl/internal/provider"
 )
 
 // uninstallCmd represents the uninstall command

@@ -38,7 +38,7 @@ spec:
     spec:
       containers:
       - name: workload-controller
-        image: lander2k2/threeport-workload-controller:latest
+        image: ghcr.io/threeport/threeport-workload-controller:latest
         imagePullPolicy: IfNotPresent
         envFrom:
           - secretRef:
