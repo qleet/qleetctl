@@ -77,7 +77,6 @@ brews:
     dependencies:
       - name: kubectl
       - name: kind
-      - name: curl
       - name: wget
       - name: jq
 
