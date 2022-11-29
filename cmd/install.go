@@ -13,8 +13,9 @@ import (
 
 	"github.com/spf13/cobra"
 	tpclient "github.com/threeport/threeport-go-client"
-	tpapi "github.com/threeport/threeport-rest-api/pkg/api"
 	kubeclient "k8s.io/client-go/tools/clientcmd"
+
+	tpapi "github.com/threeport/threeport-rest-api/pkg/api/v0"
 
 	"github.com/qleet/qleetctl/internal/install"
 	"github.com/qleet/qleetctl/internal/provider"
@@ -23,8 +24,8 @@ import (
 // installCmd represents the install command
 var installCmd = &cobra.Command{
 	Use:   "install",
-	Short: "Install the QleetOS controle plane",
-	Long:  `Install the QleetOS controle plane.`,
+	Short: "Install the QleetOS control plane",
+	Long:  `Install the QleetOS control plane.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// write kind config file to /tmp directory
 		configFile, err := os.Create(provider.QleetKindConfigPath)
