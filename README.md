@@ -21,7 +21,7 @@ VERSION=$(curl -sL https://github.com/qleet/qleetctl/releases/ | xmllint -html -
 ```
 or a specific version
 ```bash
-VERSION=v0.1.1
+VERSION=v0.1.4
 ```
 then download and install binaries
 ```bash
