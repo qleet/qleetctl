@@ -40,6 +40,7 @@ release: build
 	@echo -n "Are you sure to create and push ${NT} tag? [y/N] " && read ans && [ $${ans:-N} = y ]
 	@echo ${NT} > ./cmd/version.txt
 	@git add -A
+	@git commit -a -s -m "Cut ${NT} release"
 	@git tag -a -m "Cut ${NT} release" ${NT}
 	@git push origin ${NT}
 	@git push
