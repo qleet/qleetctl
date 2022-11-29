@@ -11,6 +11,11 @@ help:
 	@echo "Commands :"
 	@grep -E '[a-zA-Z\.\-]+:.*?@ .*$$' $(MAKEFILE_LIST)| tr -d '#' | awk 'BEGIN {FS = ":.*?@ "}; {printf "\033[32m%-19s\033[0m - %s\n", $$1, $$2}'
 
+#clean: @ Cleanup
+clean:
+	@rm -rf ./dist
+	@rm -rf ./completions
+
 #test: @ Run tests
 test:
 	@go generate
@@ -33,13 +38,15 @@ install: build
 release: build
 	$(eval NT=$(NEWTAG))
 	@echo -n "Are you sure to create and push ${NT} tag? [y/N] " && read ans && [ $${ans:-N} = y ]
+	@echo ${NT} > ./cmd/version.txt
+	@git add -A
 	@git tag -a -m "Cut ${NT} release" ${NT}
 	@git push origin ${NT}
 	@git push
 	@echo "Done."
 
 #test-release-local: @ Build binaries locally without publishing
-test-release-local: build
+test-release-local: clean build
 	goreleaser release --rm-dist --snapshot
 
 #update: @ Update dependencies to latest versions

@@ -21,7 +21,7 @@ VERSION=$(curl -sL https://github.com/qleet/qleetctl/releases/ | xmllint -html -
 ```
 or a specific version
 ```bash
-VERSION=v0.0.2
+VERSION=v0.1.1
 ```
 then download and install binaries
 ```bash
@@ -64,6 +64,7 @@ $ make
 Usage: make COMMAND
 Commands :
 help                - List available tasks
+clean               - Cleanup
 test                - Run tests
 build               - Build workload controller binary
 get                 - Download and install dependency packages
