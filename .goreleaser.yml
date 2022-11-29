@@ -84,6 +84,9 @@ brews:
 
     install: |-
       bin.install "qleetctl"
+      bash_completion.install "completions/qleetctl.bash" => "qleetctl"
+      zsh_completion.install "completions/qleetctl.zsh" => "_qleetctl"
+      fish_completion.install "completions/qleetctl.fish"
 
     # So you can `brew test` your formula.
     # Default is empty.
