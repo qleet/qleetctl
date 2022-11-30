@@ -14,7 +14,6 @@ builds:
       - amd64
       - arm
       - arm64
-    binary: qleetctl
 archives:
   - replacements:
       darwin: Darwin
@@ -26,7 +25,7 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
-  - files:
+    files:
       - README.md
       - completions/*
 checksum:

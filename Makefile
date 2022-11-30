@@ -48,7 +48,8 @@ release: build
 
 #test-release-local: @ Build binaries locally without publishing
 test-release-local: clean build
-	goreleaser release --rm-dist --snapshot
+	@goreleaser check
+	@goreleaser release --rm-dist --snapshot
 
 #update: @ Update dependencies to latest versions
 update:
