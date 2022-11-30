@@ -3,7 +3,8 @@ before:
   hooks:
     - ./build/completions.sh
 builds:
-  - env:
+  - id: qleetctl
+    env:
       - CGO_ENABLED=0
     goos:
       - darwin
@@ -13,6 +14,7 @@ builds:
       - amd64
       - arm
       - arm64
+    binary: qleetctl
 archives:
   - replacements:
       darwin: Darwin
