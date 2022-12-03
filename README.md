@@ -12,29 +12,83 @@ Install and manage instances of the QleetOS.
 
 ## Install
 
-### Installation from public repository
+### Prebuilt binaries
 
-Download pre-compiled binaries:
-set `VERSION` environment variable to latest
+Prebuilt binaries are available for a variety of operating systems and architectures.</br>
+Set `VERSION` environment variable to latest
 ```bash
 VERSION=$(curl -sL https://github.com/qleet/qleetctl/releases/ | xmllint -html -xpath '//a[contains(@href, "releases")]/text()' - 2> /dev/null | grep -P '^v' | head -n1)
 ```
 or a specific version
 ```bash
-VERSION=v0.1.4
+VERSION=v0.1.9
 ```
-then download and install binaries
+download and install prebuilt binaries
 ```bash
 wget https://github.com/qleet/qleetctl/releases/download/${VERSION}/qleetctl_${VERSION}_$(echo $(uname))_$(uname -m).tar.gz -O - |\
     tar -xz && sudo mv qleetctl /usr/local/bin/qleetctl
 ```
 
-### Homebrew
-Available for MacOS and Linux.
+### Package managers
+#### Homebrew
+Homebrew is a free and open source package manager for macOS and Linux.
 
 ```bash
 brew tap qleet/tap
 brew install qleet/tap/qleetctl
+```
+
+### Linux
+
+#### Debian
+Derivatives of the Debian distribution of Linux include elementary OS, KDE neon, Linux Lite, Linux Mint, MX Linux, Pop!_OS, Ubuntu, Zorin OS, and others.</br></br>
+Set `VERSION` to 
+* latest
+    ```bash
+    VERSION=$(curl -sL https://github.com/qleet/qleetctl/releases/ | xmllint -html -xpath '//a[contains(@href, "releases")]/text()' - 2> /dev/null | grep -P '^v' | head -n1)
+    ```
+* or a specific version
+    ```bash
+    VERSION=v0.1.9
+    ```
+download and install package
+```bash
+TEMP_PACKAGE="$(mktemp)" && wget -O "$TEMP_PACKAGE" "https://github.com/qleet/qleetctl/releases/download/${VERSION}/qleetctl_${VERSION}_$(uname -m | sed -E 's/^(aarch64|aarch64_be|armv6l|armv7l|armv8b|armv8l)$$/arm64/g' | sed -E 's/^x86_64$$/amd64/g').deb" && sudo dpkg -i "$TEMP_PACKAGE"
+rm -f "$TEMP_PACKAGE"
+```
+
+#### Fedora
+Derivatives of the Fedora distribution of Linux include CentOS, Red Hat Enterprise Linux, and others.</br></br>
+Set `VERSION` to
+* latest
+    ```bash
+    VERSION=$(curl -sL https://github.com/qleet/qleetctl/releases/ | xmllint -html -xpath '//a[contains(@href, "releases")]/text()' - 2> /dev/null | grep -P '^v' | head -n1)
+    ```
+* or a specific version
+    ```bash
+    VERSION=v0.1.9
+    ```
+download and install package
+```bash
+TEMP_PACKAGE="$(mktemp)" && wget -O "$TEMP_PACKAGE" "https://github.com/qleet/qleetctl/releases/download/${VERSION}/qleetctl_${VERSION}_$(uname -m | sed -E 's/^(aarch64|aarch64_be|armv6l|armv7l|armv8b|armv8l)$$/arm64/g' | sed -E 's/^x86_64$$/amd64/g').rpm" && sudo dnf -y "$TEMP_PACKAGE"
+rm -f "$TEMP_PACKAGE"
+```
+
+#### Alpine
+
+Set `VERSION` to
+* latest
+    ```bash
+    VERSION=$(curl -sL https://github.com/qleet/qleetctl/releases/ | xmllint -html -xpath '//a[contains(@href, "releases")]/text()' - 2> /dev/null | grep -P '^v' | head -n1)
+    ```
+* or a specific version
+    ```bash
+    VERSION=v0.1.9
+    ```
+download and install package
+```bash
+TEMP_PACKAGE="$(mktemp)" && wget -O "$TEMP_PACKAGE" "https://github.com/qleet/qleetctl/releases/download/${VERSION}/qleetctl_${VERSION}_$(uname -m | sed -E 's/^(aarch64|aarch64_be|armv6l|armv7l|armv8b|armv8l)$$/arm64/g' | sed -E 's/^x86_64$$/amd64/g').apk" && sudo apk add --allow-untrusted "$TEMP_PACKAGE"
+rm -f "$TEMP_PACKAGE"
 ```
 
 ## Release
