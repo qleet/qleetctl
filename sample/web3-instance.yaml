@@ -1,0 +1,3 @@
+Name: "web3-sample-app-instance"
+WorkloadClusterName: "default-qleet-compute-space"
+WorkloadDefinitionName: "web3-sample-app-definition"

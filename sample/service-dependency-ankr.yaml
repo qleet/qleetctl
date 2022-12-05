@@ -1,0 +1,4 @@
+Name: "web3-sample-app-service"
+UpstreamHost: "rpc.ankr.com"
+UpstreamPath: "/eth"
+WorkloadInstanceName: "web3-sample-app-instance"

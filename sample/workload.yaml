@@ -1,0 +1,15 @@
+Name: "sample-app"
+WorkloadDefinition:
+  Name: "sample-app-definition"
+  YAMLDocument: "sample/sample-app-manifest.yaml"
+  UserID: 1
+WorkloadInstance:
+  Name: "sample-app-instance"
+  WorkloadClusterName: "default-qleet-compute-space"
+  WorkloadDefinitionName: "sample-app-definition"
+WorkloadServiceDependency:
+  Name: "sample-app-service"
+  UpstreamHost: "dog.ceo"
+  UpstreamPath: "/api/breeds/list/all"
+  WorkloadInstanceName: "sample-app-instance"
+

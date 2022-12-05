@@ -1,0 +1,4 @@
+Name: "sample-app-service"
+UpstreamHost: "dog.ceo"
+UpstreamPath: "/api/breeds/list/all"
+WorkloadInstanceName: "sample-app-instance"

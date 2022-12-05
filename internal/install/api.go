@@ -491,7 +491,7 @@ spec:
     spec:
       containers:
       - name: api-server
-        image: ghcr.io/threeport/threeport-rest-api:v1.1.0
+        image: lander2k2/threeport-rest-api:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 1323
