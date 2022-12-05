@@ -1,11 +1,5 @@
 module github.com/qleet/qleetctl
 
-replace github.com/threeport/threeport-rest-api => /home/lander2k2/Projects/src/github.com/threeport/threeport-rest-api
-
-replace github.com/threeport/threeport-controller-library => /home/lander2k2/Projects/src/github.com/threeport/threeport-controller-library
-
-replace github.com/threeport/threeport-go-client => /home/lander2k2/Projects/src/github.com/threeport/threeport-go-client
-
 go 1.18
 
 require (
