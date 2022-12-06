@@ -13,6 +13,15 @@ import (
 	"github.com/spf13/viper"
 )
 
+const (
+	configName = "config"
+	configType = "yaml"
+)
+
+func configPath(homedir string) string {
+	return fmt.Sprintf("%s/.config/qleet", homedir)
+}
+
 var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
@@ -43,21 +52,35 @@ func init() {
 }
 
 func initConfig() {
-	// Don't forget to read config either from cfgFile or from home directory!
+	// read config file if provided, else go to default
 	if cfgFile != "" {
-		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
 	} else {
-		// Find home directory.
 		home, err := homedir.Dir()
+
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 
-		// Search config in home directory with name ".cobra" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".config/qleet/config")
+		viper.AddConfigPath(configPath(home))
+		viper.SetConfigName(configName)
+		viper.SetConfigType(configType)
+
+		// create config if not present
+		configFilePath := fmt.Sprintf("%s/%s.%s", configPath(home), configName, configType)
+		if err := viper.SafeWriteConfigAs(configFilePath); err != nil {
+			if os.IsNotExist(err) {
+				if err := os.MkdirAll(configPath(home), os.ModePerm); err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+				if err := viper.WriteConfigAs(configFilePath); err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+			}
+		}
 	}
 
 	if err := viper.ReadInConfig(); err != nil {
