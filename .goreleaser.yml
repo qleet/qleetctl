@@ -23,7 +23,7 @@ archives:
       windows: Windows
       386: i386
       amd64: x86_64
-    name_template: "qleetctl_v{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    name_template: "{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     format_overrides:
       - goos: windows
         format: zip
@@ -43,7 +43,7 @@ changelog:
       - '^test(\(.*\))?:'
       - '^ci(\(.*\))?:'
       - '^chore(\(.*\))?:'
-      - '^bld(\(.*\))?:'
+      - '^build(\(.*\))?:'
 brews:
   - name: qleetctl
     tap:
@@ -63,7 +63,7 @@ brews:
 
     # Your app's homepage.
     # Default is empty.
-    homepage: "https://github.com/qleet/qleetctl"
+    homepage: "https://github.com/qleet/{{ .ProjectName }}"
 
     # Template of your app's description.
     # Default is empty.
@@ -89,30 +89,30 @@ brews:
       - name: jq
 
     install: |-
-      bin.install "qleetctl"
-      bash_completion.install "completions/qleetctl.bash" => "qleetctl"
-      zsh_completion.install "completions/qleetctl.zsh" => "_qleetctl"
-      fish_completion.install "completions/qleetctl.fish"
+      bin.install "{{ .ProjectName }}"
+      bash_completion.install "completions/{{ .ProjectName }}.bash" => "{{ .ProjectName }}"
+      zsh_completion.install "completions/{{ .ProjectName }}.zsh" => "_{{ .ProjectName }}"
+      fish_completion.install "completions/{{ .ProjectName }}.fish"
 
     # So you can `brew test` your formula.
     # Default is empty.
     test: |
-      system "#{bin}/qleetctl version"
+      system "#{bin}/{{ .ProjectName }} version"
 
 nfpms:
   - file_name_template: 'qleetctl_v{{ .Version }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
-    homepage: https://github.com/qleet/qleetctl
+    homepage: https://github.com/qleet/{{ .ProjectName }}
     description: "A CLI for managing the Qleet OS."
     maintainer: Andriy Kalashnykov <AndriyKalashnykov@gmail.com>
     license: MIT
     vendor: qleet
     contents:
-      - src: completions/qleetctl.bash
-        dst: /etc/bash_completion.d/qleetctl
-      - src: completions/qleetctl.fish
-        dst: /usr/share/fish/completions/qleetctl.fish
-      - src: completions/qleetctl.zsh
-        dst: /usr/local/share/zsh/site-functions/_qleetctl
+      - src: ./completions/{{ .ProjectName }}.bash
+        dst: /etc/bash_completion.d/{{ .ProjectName }}
+      - src: ./completions/{{ .ProjectName }}.fish
+        dst: /usr/share/fish/completions/{{ .ProjectName }}.fish
+      - src: ./completions/{{ .ProjectName }}.zsh
+        dst: /usr/local/share/zsh/site-functions/_{{ .ProjectName }}
     formats:
       - apk
       - deb

@@ -15,15 +15,16 @@ help:
 clean:
 	@rm -rf ./dist
 	@rm -rf ./completions
+	@rm -f ./qleetctl
 
 #test: @ Run tests
 test:
-	@go generate
+	@export GOPRIVATE=$(GOPRIVATE); go generate
 	@export GOPRIVATE=$(GOPRIVATE); export GOFLAGS=$(GOFLAGS); go test $(go list ./... | grep -v /internal/setup)
 
 #build: @ Build workload controller binary
 build:
-	@go generate
+	@export GOPRIVATE=$(GOPRIVATE); go generate
 	@export GOPRIVATE=$(GOPRIVATE); export GOFLAGS=$(GOFLAGS); export CGO_ENABLED=0; go build -a -o qleetctl main.go
 
 #get: @ Download and install dependency packages
@@ -31,11 +32,11 @@ get:
 	@export GOPRIVATE=$(GOPRIVATE); export GOFLAGS=$(GOFLAGS); go get . ; go mod tidy
 
 #install: @ Install the qleetctl CLI
-install: bld
+install: build
 	sudo mv ./qleetctl /usr/local/bin/
 
 #release: @ Create and push a new tag
-release: bld
+release: build
 	$(eval NT=$(NEWTAG))
 	@echo -n "Are you sure to create and push ${NT} tag? [y/N] " && read ans && [ $${ans:-N} = y ]
 	@echo ${NT} > ./cmd/version.txt
@@ -47,7 +48,7 @@ release: bld
 	@echo "Done."
 
 #test-release-local: @ Build binaries locally without publishing
-test-release-local: clean bld
+test-release-local: clean
 	@goreleaser check
 	@goreleaser release --rm-dist --snapshot
 

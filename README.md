@@ -6,9 +6,10 @@ Install and manage instances of the QleetOS.
 * [go 1.18](https://go.dev/doc/install)
 * [curl](https://help.ubidots.com/en/articles/2165289-learn-how-to-install-run-curl-on-windows-macosx-linux)
 * [wget](https://www.gnu.org/software/wget/)
+* [jq](https://github.com/stedolan/jq/wiki/Installation)
 * [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
 * [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
-* [homebrew](https://brew.sh/) MacOS users
+* [homebrew](https://brew.sh/)
 
 ## Install
 
