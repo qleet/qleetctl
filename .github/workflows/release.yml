@@ -26,6 +26,9 @@ jobs:
     - name: Configure git to access private repos
       run: git config --global url.https://$GH_ACCESS_TOKEN@github.com/.insteadOf https://github.com/
 
+    - name: Build
+      run: make build
+
     - name: Run GoReleaser
       uses: goreleaser/goreleaser-action@v3.2.0
       with:
