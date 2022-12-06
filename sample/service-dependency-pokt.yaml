@@ -1,0 +1,4 @@
+Name: "web3-sample-app-service"
+UpstreamHost: "eth-rpc.gateway.pokt.network"
+UpstreamPath: "/"
+WorkloadInstanceName: "web3-sample-app-instance"

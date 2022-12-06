@@ -1,0 +1,3 @@
+Name: "sample-app-instance"
+WorkloadClusterName: "default-qleet-compute-space"
+WorkloadDefinitionName: "sample-app-definition"

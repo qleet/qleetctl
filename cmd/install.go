@@ -13,9 +13,8 @@ import (
 
 	"github.com/spf13/cobra"
 	tpclient "github.com/threeport/threeport-go-client"
-	kubeclient "k8s.io/client-go/tools/clientcmd"
-
 	tpapi "github.com/threeport/threeport-rest-api/pkg/api/v0"
+	kubeclient "k8s.io/client-go/tools/clientcmd"
 
 	"github.com/qleet/qleetctl/internal/install"
 	"github.com/qleet/qleetctl/internal/provider"

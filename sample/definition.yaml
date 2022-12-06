@@ -1,0 +1,3 @@
+Name: "sample-app-definition"
+YAMLDocument: "sample/sample-app-manifest.yaml"
+UserID: 1

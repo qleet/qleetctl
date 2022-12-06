@@ -1,0 +1,4 @@
+Name: "sample-app-service"
+UpstreamHost: "vpic.nhtsa.dot.gov"
+UpstreamPath: "/api/vehicles/getallmanufacturers?format=json"
+WorkloadInstanceName: "sample-app-instance"
