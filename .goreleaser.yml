@@ -1,7 +1,7 @@
 ---
 before:
   hooks:
-    - ./build/completions.sh
+    - ./bld/completions.sh
 builds:
   - id: qleetctl
     env:
@@ -41,7 +41,7 @@ changelog:
       - '^test(\(.*\))?:'
       - '^ci(\(.*\))?:'
       - '^chore(\(.*\))?:'
-      - '^build(\(.*\))?:'
+      - '^bld(\(.*\))?:'
 brews:
   - name: qleetctl
     tap:

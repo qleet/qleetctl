@@ -31,11 +31,11 @@ get:
 	@export GOPRIVATE=$(GOPRIVATE); export GOFLAGS=$(GOFLAGS); go get . ; go mod tidy
 
 #install: @ Install the qleetctl CLI
-install: build
+install: bld
 	sudo mv ./qleetctl /usr/local/bin/
 
 #release: @ Create and push a new tag
-release: build
+release: bld
 	$(eval NT=$(NEWTAG))
 	@echo -n "Are you sure to create and push ${NT} tag? [y/N] " && read ans && [ $${ans:-N} = y ]
 	@echo ${NT} > ./cmd/version.txt
@@ -47,7 +47,7 @@ release: build
 	@echo "Done."
 
 #test-release-local: @ Build binaries locally without publishing
-test-release-local: clean build
+test-release-local: clean bld
 	@goreleaser check
 	@goreleaser release --rm-dist --snapshot
 
