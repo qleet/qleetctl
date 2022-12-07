@@ -10,8 +10,8 @@ import (
 // updateCmd represents the update command
 var updateCmd = &cobra.Command{
 	Use:   "update",
-	Short: "Update objects in the Qleet system",
-	Long: `Update objects in the Qleet system.
+	Short: "Update QleetOS objects",
+	Long: `Update QleetOS objects.
 
 The update command does nothing by itself.  Use one of the avilable subcommands
 to update different objects in the system`,
