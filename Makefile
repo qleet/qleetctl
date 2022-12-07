@@ -61,5 +61,5 @@ version:
 
 #codegen-subcommand:  @ Build subcommand - a tool for generating subcommand source code
 codegen-subcommand:
-	@go build -o subcommand codegen/subcommand/main.go
+	@go build -o bin/subcommand codegen/subcommand/main.go
 

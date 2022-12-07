@@ -1,5 +1,10 @@
 # Developer Docs
 
+## Conventions
+
+Use kebab case for command names.  For example if operating on a Workload
+Definition object, the command should be `workload-definition`.
+
 ## Subcommand Code Generation
 
 There is a lot of common code between subcommands.  This utility will scaffold out
@@ -30,7 +35,7 @@ For example, if you want to use qleetctl to create a new object called a "widget
 you will run:
 
 ```bash
-./subcommand create widget -l
+./bin/subcommand create widget -l
 ```
 
 This will add a new file `cmd/create_widget.go`.  It will have the scaffolding

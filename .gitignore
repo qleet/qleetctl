@@ -1,5 +1,5 @@
 qleetctl
-subcommand
 .idea/
 dist/
 completions/
+bin/
