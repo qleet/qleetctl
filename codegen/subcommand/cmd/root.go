@@ -97,11 +97,11 @@ The --optional-config flag will make that config file an optional flag.`,
 			os.Exit(1)
 		}
 
-		fmt.Printf("Success: subcommand source code file written to %s\n", filename)
-
 		if loadConfig {
 			fmt.Printf("Note: the source code generated includes a reference to `config.%sConfig` which you will have to create.\n", strcase.ToCamel(name))
 		}
+
+		fmt.Printf("Complete: subcommand source code file written to %s\n", filename)
 
 		return nil
 	},
@@ -128,6 +128,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 {{- if .LoadConfig }}
 	"io/ioutil"
 {{- end }}
@@ -156,23 +157,23 @@ var {{ .LowerCamelParent }}{{ .CamelName }}Cmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Long: ` + "`" + `A long description of your command.` + "`" + `,
 	SilenceUsage: true,
-	RunE: func(cmd *cobra.Command, args []string) error {
+	Run: func(cmd *cobra.Command, args []string) {
 {{- if .LoadConfig }}
 		// load config
 		configContent, err := ioutil.ReadFile({{ .LowerCamelParent }}{{ .CamelName }}ConfigPath)
 		if err != nil {
-			return qout.Error("failed to read config file", err)
+			qout.Error("failed to read config file", err)
+			os.Exit(1)
 		}
 		var {{ .LowerCamelName }} config.{{ .CamelName }}Config
 		if err := yaml.Unmarshal(configContent, &{{ .LowerCamelName }}); err != nil {
-			return qout.Error("failed to unmarshal config file yaml content", err)
+			qout.Error("failed to unmarshal config file yaml content", err)
+			os.Exit(1)
 		}
 
-		fmt.Printf("%+v\n", {{ .LowerCamelName }})
+		qout.Info(fmt.Sprintf("%+v\n", {{ .LowerCamelName }}))
 {{ end }}
-		fmt.Println("{{ .Parent }} {{ .Name }} called")
-
-		return nil
+		qout.Complete("{{ .Parent }} {{ .Name }} called")
 	},
 }
 
