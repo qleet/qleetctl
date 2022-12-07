@@ -58,3 +58,8 @@ update:
 #version: @ Print current version(tag)
 version:
 	@echo $(shell git describe --tags --abbrev=0)
+
+#codegen-subcommand:  @ Build subcommand - a tool for generating subcommand source code
+codegen-subcommand:
+	@go build -o subcommand codegen/subcommand/main.go
+

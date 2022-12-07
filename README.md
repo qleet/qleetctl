@@ -127,4 +127,5 @@ release             - Create and push a new tag
 test-release-local  - Build binaries locally without publishing
 update              - Update dependencies to latest versions
 version             - Print current version(tag)
+codegen-subcommand  - Build subcommand - a tool for generating subcommand source code
 ```

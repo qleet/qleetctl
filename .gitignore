@@ -1,4 +1,5 @@
 qleetctl
+subcommand
 .idea/
 dist/
 completions/
