@@ -1,4 +1,4 @@
-package config
+package api
 
 import (
 	"encoding/json"
@@ -130,7 +130,7 @@ func (wsdc *WorkloadServiceDependencyConfig) Create() (*tpapi.WorkloadServiceDep
 		"http://localhost:1323", "",
 	)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	// construct workload service dependency object
@@ -144,11 +144,55 @@ func (wsdc *WorkloadServiceDependencyConfig) Create() (*tpapi.WorkloadServiceDep
 	// create workload instance in API
 	wsdJSON, err := json.Marshal(&workloadServiceDependency)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	wsd, err := tpclient.CreateWorkloadServiceDependency(wsdJSON, "http://localhost:1323", "")
 	if err != nil {
-		panic(err)
+		return nil, err
+	}
+
+	return wsd, nil
+}
+
+func (wsdc *WorkloadServiceDependencyConfig) Update() (*tpapi.WorkloadServiceDependency, error) {
+	// get workload instance by name
+	workloadInstance, err := tpclient.GetWorkloadInstanceByName(
+		wsdc.WorkloadInstanceName,
+		"http://localhost:1323", "",
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// construct workload service dependency object
+	workloadServiceDependency := &tpapi.WorkloadServiceDependency{
+		Name:               &wsdc.Name,
+		UpstreamHost:       &wsdc.UpstreamHost,
+		UpstreamPath:       &wsdc.UpstreamPath,
+		WorkloadInstanceID: &workloadInstance.ID,
+	}
+
+	// get existing workload service dependency by name to retrieve its ID
+	existingWSD, err := tpclient.GetWorkloadServiceDependencyByName(
+		wsdc.Name,
+		"http://localhost:1323", "",
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// update workload instance in API
+	wsdJSON, err := json.Marshal(&workloadServiceDependency)
+	if err != nil {
+		return nil, err
+	}
+	wsd, err := tpclient.UpdateWorkloadServiceDependency(
+		existingWSD.ID,
+		wsdJSON,
+		"http://localhost:1323", "",
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	return wsd, nil

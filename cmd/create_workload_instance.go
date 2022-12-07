@@ -1,85 +1,56 @@
 /*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
+Copyright © 2023 Qleet admin@qleet.io
 */
 package cmd
 
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
-	"github.com/qleet/qleetctl/internal/config"
+	"github.com/qleet/qleetctl/internal/api"
+	qout "github.com/qleet/qleetctl/internal/output"
 )
 
-var workloadInstanceConfigPath string
+var createWorkloadInstancePath string
 
 // createWorkloadInstanceCmd represents the workload-instance command
 var createWorkloadInstanceCmd = &cobra.Command{
-	Use:   "workload-instance",
-	Short: "Create a new workload instance",
-	Long:  `Create a new workload instance.`,
+	Use:          "workload-instance",
+	Example:      "qleetctl create workload-instance -c /path/to/config.yaml",
+	Short:        "Create a new workload instance",
+	Long:         `Create a new workload instance.`,
+	SilenceUsage: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		// load config
-		configContent, err := ioutil.ReadFile(workloadInstanceConfigPath)
+		configContent, err := ioutil.ReadFile(createWorkloadInstancePath)
 		if err != nil {
-			panic(err)
+			qout.Error("failed to read config file", err)
+			os.Exit(1)
 		}
-		var workloadInstanceConfig config.WorkloadInstanceConfig
-		if err := yaml.Unmarshal(configContent, &workloadInstanceConfig); err != nil {
-			panic(err)
+		var workloadInstance api.WorkloadInstanceConfig
+		if err := yaml.Unmarshal(configContent, &workloadInstance); err != nil {
+			qout.Error("failed to unmarshal config file yaml content", err)
+			os.Exit(1)
 		}
 
 		// create workload instance
-		workloadInstance, err := workloadInstanceConfig.Create()
+		wi, err := workloadInstance.Create()
 		if err != nil {
-			panic(err)
+			qout.Error("failed to create workload", err)
+			os.Exit(1)
 		}
 
-		//// get workload cluster by name
-		//workloadCluster, err := tpclient.GetWorkloadClusterByName(
-		//	workloadInstanceConfig.WorkloadClusterName,
-		//	"http://localhost:1323", "",
-		//)
-		//if err != nil {
-		//	panic(err)
-		//}
-
-		//// get workload definition by name
-		//workloadDefinition, err := tpclient.GetWorkloadDefinitionByName(
-		//	workloadInstanceConfig.WorkloadDefinitionName,
-		//	"http://localhost:1323", "",
-		//)
-		//if err != nil {
-		//	panic(err)
-		//}
-
-		//// construct workload instance object
-		//workloadInstance := &tpapi.WorkloadInstance{
-		//	Name:                 &workloadInstanceConfig.Name,
-		//	WorkloadClusterID:    &workloadCluster.ID,
-		//	WorkloadDefinitionID: &workloadDefinition.ID,
-		//}
-
-		//// create workload instance in API
-		//wiJSON, err := json.Marshal(&workloadInstance)
-		//if err != nil {
-		//	panic(err)
-		//}
-		//wi, err := tpclient.CreateWorkloadInstance(wiJSON, "http://localhost:1323", "")
-		//if err != nil {
-		//	panic(err)
-		//}
-
-		fmt.Printf("workload instance %s created\n", *workloadInstance.Name)
+		qout.Complete(fmt.Sprintf("workload instance %s created\n", *wi.Name))
 	},
 }
 
 func init() {
 	createCmd.AddCommand(createWorkloadInstanceCmd)
 
-	createWorkloadInstanceCmd.Flags().StringVarP(&workloadInstanceConfigPath, "config", "c", "", "path to file with workload instance config")
+	createWorkloadInstanceCmd.Flags().StringVarP(&createWorkloadInstancePath, "config", "c", "", "path to file with workload instance config")
 	createWorkloadInstanceCmd.MarkFlagRequired("config")
 }
