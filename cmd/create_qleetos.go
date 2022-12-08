@@ -5,37 +5,42 @@ package cmd
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"time"
 
+	"github.com/qleet/qleetctl/internal/provider"
 	"github.com/spf13/cobra"
 	tpclient "github.com/threeport/threeport-go-client"
 	tpapi "github.com/threeport/threeport-rest-api/pkg/api/v0"
 	kubeclient "k8s.io/client-go/tools/clientcmd"
 
 	"github.com/qleet/qleetctl/internal/install"
-	"github.com/qleet/qleetctl/internal/provider"
+	qout "github.com/qleet/qleetctl/internal/output"
 )
 
-// installCmd represents the install command
-var installCmd = &cobra.Command{
-	Use:   "install",
-	Short: "Install the QleetOS control plane",
-	Long:  `Install the QleetOS control plane.`,
+// createQleetosCmd represents the create qleetos command
+var createQleetosCmd = &cobra.Command{
+	Use:          "qleetos",
+	Example:      "qleetctl create qleetos",
+	Short:        "Create a new instance of the QleetOS control plane",
+	Long:         `Create a new instance of the QleetOS control plane.`,
+	SilenceUsage: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		// write kind config file to /tmp directory
 		configFile, err := os.Create(provider.QleetKindConfigPath)
 		if err != nil {
-			panic(err)
+			qout.Error("failed to write kind config file to disk", err)
+			os.Exit(1)
 		}
 		defer configFile.Close()
 		configFile.WriteString(provider.KindConfig())
-		fmt.Println("kind config written to /tmp directory")
+		qout.Info("kind config written to /tmp directory")
 
 		// start kind cluster
-		fmt.Println("creating kind cluster... (this could take a few minutes)")
+		qout.Info("creating kind cluster... (this could take a few minutes)")
 		kindCreate := exec.Command(
 			"kind",
 			"create",
@@ -44,21 +49,23 @@ var installCmd = &cobra.Command{
 			provider.QleetKindConfigPath,
 		)
 		if err := kindCreate.Run(); err != nil {
-			panic(err)
+			qout.Error("failed to create new kind cluster", err)
+			os.Exit(1)
 		}
-		fmt.Println("kind cluster created")
+		qout.Info("kind cluster created")
 
 		// write API dependencies manifest to /tmp directory
 		apiDepsManifest, err := os.Create(install.APIDepsManifestPath)
 		if err != nil {
-			panic(err)
+			qout.Error("failed to write API dependency manifests to disk", err)
+			os.Exit(1)
 		}
 		defer apiDepsManifest.Close()
 		apiDepsManifest.WriteString(install.APIDepsManifest())
-		fmt.Println("QleetOS API dependencies manifest written to /tmp directory")
+		qout.Info("QleetOS API dependencies manifest written to /tmp directory")
 
 		// install API dependencies on kind cluster
-		fmt.Println("installing QleetOS API dependencies")
+		qout.Info("installing QleetOS API dependencies")
 		apiDepsCreate := exec.Command(
 			"kubectl",
 			"apply",
@@ -66,7 +73,8 @@ var installCmd = &cobra.Command{
 			install.APIDepsManifestPath,
 		)
 		if err := apiDepsCreate.Run(); err != nil {
-			panic(err)
+			qout.Error("failed to install API dependencies to kind cluster", err)
+			os.Exit(1)
 		}
 		psqlConfigCreate := exec.Command(
 			"kubectl",
@@ -77,22 +85,24 @@ var installCmd = &cobra.Command{
 			install.ThreeportControlPlaneNs,
 		)
 		if err := psqlConfigCreate.Run(); err != nil {
-			panic(err)
+			qout.Error("failed to create API database config", err)
+			os.Exit(1)
 		}
 
-		fmt.Println("QleetOS API dependencies created")
+		qout.Info("QleetOS API dependencies created")
 
 		// write API server manifest to /tmp directory
 		apiServerManifest, err := os.Create(install.APIServerManifestPath)
 		if err != nil {
-			panic(err)
+			qout.Error("failed to write API manifest to disk", err)
+			os.Exit(1)
 		}
 		defer apiServerManifest.Close()
 		apiServerManifest.WriteString(install.APIServerManifest())
-		fmt.Println("QleetOS API server manifest written to /tmp directory")
+		qout.Info("QleetOS API server manifest written to /tmp directory")
 
 		// install QleetOS API
-		fmt.Println("installing QleetOS API server")
+		qout.Info("installing QleetOS API server")
 		apiServerCreate := exec.Command(
 			"kubectl",
 			"apply",
@@ -100,22 +110,24 @@ var installCmd = &cobra.Command{
 			install.APIServerManifestPath,
 		)
 		if err := apiServerCreate.Run(); err != nil {
-			panic(err)
+			qout.Error("failed to create API server", err)
+			os.Exit(1)
 		}
 
-		fmt.Println("QleetOS API server created")
+		qout.Info("QleetOS API server created")
 
 		// write workload controller manifest to /tmp directory
 		workloadControllerManifest, err := os.Create(install.WorkloadControllerManifestPath)
 		if err != nil {
-			panic(err)
+			qout.Error("failed to write workload controller manifest to disk", err)
+			os.Exit(1)
 		}
 		defer workloadControllerManifest.Close()
 		workloadControllerManifest.WriteString(install.WorkloadControllerManifest())
-		fmt.Println("QleetOS workload controller manifest written to /tmp directory")
+		qout.Info("QleetOS workload controller manifest written to /tmp directory")
 
 		// install workload controller
-		fmt.Println("installing QleetOS workload controller")
+		qout.Info("installing QleetOS workload controller")
 		workloadControllerCreate := exec.Command(
 			"kubectl",
 			"apply",
@@ -123,13 +135,14 @@ var installCmd = &cobra.Command{
 			install.WorkloadControllerManifestPath,
 		)
 		if err := workloadControllerCreate.Run(); err != nil {
-			panic(err)
+			qout.Error("failed to create workload controller", err)
+			os.Exit(1)
 		}
 
-		fmt.Println("QleetOS workload controller created")
+		qout.Info("QleetOS workload controller created")
 
 		// wait a few seconds for everything to come up
-		fmt.Println("waiting for components to spin up...")
+		qout.Info("waiting for components to spin up...")
 		time.Sleep(time.Second * 200)
 
 		// get kubeconfig
@@ -137,13 +150,15 @@ var installCmd = &cobra.Command{
 
 		clientConfigLoadRules, err := defaultLoadRules.Load()
 		if err != nil {
-			panic(err)
+			qout.Error("failed to load default kubeconfig rules", err)
+			os.Exit(1)
 		}
 
 		clientConfig := kubeclient.NewDefaultClientConfig(*clientConfigLoadRules, &kubeclient.ConfigOverrides{})
 		kubeConfig, err := clientConfig.RawConfig()
 		if err != nil {
-			panic(err)
+			qout.Error("failed to load kubeconfig", err)
+			os.Exit(1)
 		}
 
 		// get cluster CA and server endpoint
@@ -156,7 +171,10 @@ var installCmd = &cobra.Command{
 			}
 		}
 		if !clusterFound {
-			fmt.Println("kubeconfig cluster for qleet-os not found")
+			qout.Error(
+				"failed to get Kubernetes cluster CA and endpoint",
+				errors.New("cluster config not found in kubeconfig"),
+			)
 			os.Exit(1)
 		}
 
@@ -172,7 +190,10 @@ var installCmd = &cobra.Command{
 			}
 		}
 		if !userFound {
-			fmt.Println("kubeconfig user for qleet-os not found")
+			qout.Error(
+				"failed to get user credentials to Kubernetes cluster",
+				errors.New("kubeconfig user for qleet-os cluster not found"),
+			)
 			os.Exit(1)
 		}
 
@@ -192,19 +213,22 @@ var installCmd = &cobra.Command{
 		}
 		wcJSON, err := json.Marshal(&workloadCluster)
 		if err != nil {
-			panic(err)
+			qout.Error("failed to marshal workload cluster to json", err)
+			os.Exit(1)
 		}
 		wc, err := tpclient.CreateWorkloadCluster(wcJSON, "http://localhost:1323", "")
 		if err != nil {
-			panic(err)
+			qout.Error("failed to create workload cluster in Qleet API", err)
+			os.Exit(1)
 		}
+		qout.Info(fmt.Sprintf("default workload cluster %s for compute space set up", *wc.Name))
 
-		fmt.Printf("default workload cluster %s for compute space set up\n", *wc.Name)
+		qout.Complete("QleetOS control plane ready to use")
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(installCmd)
+	createCmd.AddCommand(createQleetosCmd)
 
-	installCmd.Flags().StringP("provider", "p", "kind", "The infrasture tool or provider to install upon")
+	createQleetosCmd.Flags().StringP("provider", "p", "kind", "The infrasture tool or provider to install upon")
 }

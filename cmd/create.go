@@ -10,8 +10,8 @@ import (
 // createCmd represents the create command
 var createCmd = &cobra.Command{
 	Use:   "create",
-	Short: "Create objects in the Qleet system",
-	Long: `Create objects in the Qleet system.
+	Short: "Create QleetOS objects",
+	Long: `Create QleetOS objects.
 
 The create command does nothing by itself.  Use one of the avilable subcommands
 to create different objects in the system`,
