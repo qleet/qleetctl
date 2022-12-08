@@ -1,22 +1,29 @@
 package provider
 
-import "fmt"
+import (
+	"fmt"
 
-const (
-	QleetKindClusterName = "qleet-os"
-	QleetKindConfigPath  = "/tmp/qleet-kind-config.yaml"
+	"github.com/qleet/qleetctl/internal/install"
 )
 
-func KindConfig() string {
+const (
+	QleetKindConfigPath = "/tmp/qleet-kind-config.yaml"
+)
+
+func GetQleetKindClusterName(qleetOSInstanceName string) string {
+	return fmt.Sprintf("qleet-os-%s", qleetOSInstanceName)
+}
+
+func KindConfig(qleetOSInstanceName string) string {
 	return fmt.Sprintf(`kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
-name: %s
+name: %[1]s
 nodes:
 - role: control-plane
 - role: worker
   extraPortMappings:
-    - containerPort: 1323
-      hostPort: 1323
+    - containerPort: %[2]s
+      hostPort: %[2]s
       protocol: TCP
-`, QleetKindClusterName)
+`, GetQleetKindClusterName(qleetOSInstanceName), install.QleetOSAPIPort)
 }

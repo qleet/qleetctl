@@ -8,10 +8,15 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
+	"github.com/qleet/qleetctl/internal/config"
 	qout "github.com/qleet/qleetctl/internal/output"
 	"github.com/qleet/qleetctl/internal/provider"
-	"github.com/spf13/cobra"
 )
+
+var deleteQleetOSInstanceName string
 
 // deleteQleetosCmd represents the delete qleetos command
 var deleteQleetosCmd = &cobra.Command{
@@ -28,7 +33,7 @@ var deleteQleetosCmd = &cobra.Command{
 			"delete",
 			"cluster",
 			"--name",
-			provider.QleetKindClusterName,
+			provider.GetQleetKindClusterName(deleteQleetOSInstanceName),
 		)
 		if err := kindDelete.Run(); err != nil {
 			qout.Error("failed to delete kind cluster", err)
@@ -36,10 +41,35 @@ var deleteQleetosCmd = &cobra.Command{
 		}
 		qout.Info("kind cluster deleted")
 
+		// get qleet config
+		qleetConfig := &config.QleetConfig{}
+		if err := viper.Unmarshal(qleetConfig); err != nil {
+			qout.Error("failed to get Qleet config", err)
+		}
+
+		// update qleet config to remove the deleted Qleet OS instance and
+		// current instance
+		updatedQleetOSInstances := []config.QleetOSInstance{}
+		for _, instance := range qleetConfig.QleetOSInstances {
+			if instance.Name == deleteQleetOSInstanceName {
+				continue
+			} else {
+				updatedQleetOSInstances = append(updatedQleetOSInstances, instance)
+			}
+		}
+
+		viper.Set("QleetOSInstances", updatedQleetOSInstances)
+		viper.Set("CurrentInstance", "")
+		viper.WriteConfig()
+		qout.Info("Qleet config updated")
+
 		qout.Complete("QleetOS instance deleted")
 	},
 }
 
 func init() {
 	deleteCmd.AddCommand(deleteQleetosCmd)
+
+	deleteQleetosCmd.Flags().StringVarP(&deleteQleetOSInstanceName, "name", "n", "", "name of Qleet OS instance")
+	deleteQleetosCmd.MarkFlagRequired("name")
 }

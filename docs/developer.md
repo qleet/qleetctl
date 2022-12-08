@@ -31,7 +31,7 @@ make codegen-subcommand
 
 Now you can use it to add source code for qleetctl.
 
-For example, if you want to use qleetctl to create a new object called a "widget,"
+For example, if you want to use qleetctl to create a new object called a "widget"
 you will run:
 
 ```bash
@@ -58,6 +58,8 @@ import (
 
 	tpclient "github.com/threeport/threeport-go-client"
 	tpapi "github.com/threeport/threeport-rest-api/pkg/api/v0"
+
+	"github.com/qleet/qleetctl/internal/install"
 )
 
 type WidgetConfig struct {
@@ -78,8 +80,7 @@ func (wc *WidgetConfig) Create() (*tpapi.Widget, error) {
 		return nil, err
 	}
     // assumes the CreateWidget function has been added to the go client
-    // http://localhost:1323 API endpoint is hardcoded for local dev in this example
-	wc, err := tpclient.CreateWidget(wcJSON, "http://localhost:1323", "")
+	wc, err := tpclient.CreateWidget(wcJSON, install.GetQleetOSAPIEndpoint(), "")
 	if err != nil {
 		return nil, err
 	}

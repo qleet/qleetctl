@@ -6,7 +6,18 @@ const (
 	ThreeportControlPlaneNs = "threeport-control-plane"
 	APIDepsManifestPath     = "/tmp/qleet-api-deps-manifest.yaml"
 	APIServerManifestPath   = "/tmp/qleet-api-server-manifest.yaml"
+	QleetOSAPIProtocol      = "http"
+	QleetOSAPIHostname      = "localhost"
+	QleetOSAPIPort          = "1323"
 )
+
+// GetQleetOSAPIEndpoint returns the QleetOS API endpoint
+func GetQleetOSAPIEndpoint() string {
+	return fmt.Sprintf(
+		"%s://%s:%s",
+		QleetOSAPIProtocol, QleetOSAPIHostname, QleetOSAPIPort,
+	)
+}
 
 // APIDepsManifest returns a yaml manifest for the threeport API dependencies
 // with the namespace included.
@@ -494,8 +505,8 @@ spec:
         image: lander2k2/threeport-rest-api:latest
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 1323
-          hostPort: 1323
+        - containerPort: %[2]s
+          hostPort: %[2]s
           name: http
           protocol: TCP
         volumeMounts:
@@ -518,6 +529,6 @@ spec:
   - name: http
     port: 80
     protocol: TCP
-    targetPort: 1323
-`, ThreeportControlPlaneNs)
+    targetPort: %[2]s
+`, ThreeportControlPlaneNs, QleetOSAPIPort)
 }
