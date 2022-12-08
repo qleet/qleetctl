@@ -13,7 +13,7 @@ jobs:
       GH_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
     strategy:
       matrix:
-        go-version: [1.18]    # https://go.dev/doc/devel/release
+        go-version: [1.19]    # https://go.dev/doc/devel/release
 
     steps:
 

@@ -3,7 +3,11 @@
 Install and manage instances of the QleetOS.
 
 ## Requirements
-* [go 1.18](https://go.dev/doc/install)
+* [gvm](https://github.com/moovweb/gvm) Go 1.19
+    ```bash
+    gvm install go1.19 --prefer-binary --with-build-tools --with-protobuf
+    gvm use go1.19 --default
+    ```
 * [curl](https://help.ubidots.com/en/articles/2165289-learn-how-to-install-run-curl-on-windows-macosx-linux)
 * [wget](https://www.gnu.org/software/wget/)
 * [jq](https://github.com/stedolan/jq/wiki/Installation)

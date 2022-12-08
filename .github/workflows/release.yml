@@ -21,7 +21,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v3.4.0
       with:
-        go-version: 1.18
+        go-version: 1.19
 
     - name: Configure git to access private repos
       run: git config --global url.https://$GH_ACCESS_TOKEN@github.com/.insteadOf https://github.com/
