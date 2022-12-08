@@ -31,7 +31,7 @@ make codegen-subcommand
 
 Now you can use it to add source code for qleetctl.
 
-For example, if you want to use qleetctl to create a new object called a "widget,"
+For example, if you want to use qleetctl to create a new object called a "widget"
 you will run:
 
 ```bash
