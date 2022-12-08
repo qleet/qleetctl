@@ -17,19 +17,23 @@ clean:
 	@rm -rf ./completions
 	@rm -f ./qleetctl
 
+#get: @ Download and install dependency packages
+get:
+	@export GOPRIVATE=$(GOPRIVATE); export GOFLAGS=$(GOFLAGS); go get . ; go mod tidy
+
+#update: @ Update dependencies to latest versions
+update:
+	@export GOPRIVATE=$(GOPRIVATE); export GOFLAGS=$(GOFLAGS); go get -u; go mod tidy
+
 #test: @ Run tests
 test:
 	@export GOPRIVATE=$(GOPRIVATE); go generate
 	@export GOPRIVATE=$(GOPRIVATE); export GOFLAGS=$(GOFLAGS); go test $(go list ./... | grep -v /internal/setup)
 
-#build: @ Build workload controller binary
+#build: @ Build qleetctl binary
 build:
 	@export GOPRIVATE=$(GOPRIVATE); go generate
 	@export GOPRIVATE=$(GOPRIVATE); export GOFLAGS=$(GOFLAGS); export CGO_ENABLED=0; go build -a -o qleetctl main.go
-
-#get: @ Download and install dependency packages
-get:
-	@export GOPRIVATE=$(GOPRIVATE); export GOFLAGS=$(GOFLAGS); go get . ; go mod tidy
 
 #install: @ Install the qleetctl CLI
 install: build
@@ -52,10 +56,6 @@ test-release-local: clean
 	@goreleaser check
 	@goreleaser release --rm-dist --snapshot
 
-#update: @ Update dependencies to latest versions
-update:
-	@export GOPRIVATE=$(GOPRIVATE); export GOFLAGS=$(GOFLAGS); go get -u; go mod tidy
-
 #version: @ Print current version(tag)
 version:
 	@echo $(shell git describe --tags --abbrev=0)
@@ -63,4 +63,3 @@ version:
 #codegen-subcommand:  @ Build subcommand - a tool for generating subcommand source code
 codegen-subcommand:
 	@go build -o bin/subcommand codegen/subcommand/main.go
-

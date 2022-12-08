@@ -96,24 +96,24 @@ TEMP_PACKAGE="$(mktemp)" && wget -O "$TEMP_PACKAGE" "https://github.com/qleet/ql
 rm -f "$TEMP_PACKAGE"
 ```
 
-## Release
-Run `release` target
-```bash
-make release
-```
-
 ## Quickstart
 
 Install the QleetOS control plane:
 
 ```bash
-qleetctl install
+qleetctl create qleetos --name qleetos
 ```
 
 Remove the QleetOS control plane:
 
 ```bash
-qleetctl uninstall
+qleetctl delete qleetos --name qleetos
+```
+
+## Release
+Run `release` target
+```bash
+make release
 ```
 
 ### Help
@@ -124,13 +124,13 @@ Usage: make COMMAND
 Commands :
 help                - List available tasks
 clean               - Cleanup
-test                - Run tests
-build               - Build workload controller binary
 get                 - Download and install dependency packages
+update              - Update dependencies to latest versions
+test                - Run tests
+build               - Build qleetctl binary
 install             - Install the qleetctl CLI
 release             - Create and push a new tag
 test-release-local  - Build binaries locally without publishing
-update              - Update dependencies to latest versions
 version             - Print current version(tag)
 codegen-subcommand  - Build subcommand - a tool for generating subcommand source code
 ```
