@@ -1,12 +1,9 @@
 /*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
+Copyright © 2023 Qleet admin@qleet.io
 */
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -14,22 +11,12 @@ import (
 var createCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create objects in the Qleet system",
-	Long:  `Create objects in the Qleet system.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("create called")
-	},
+	Long: `Create objects in the Qleet system.
+
+The create command does nothing by itself.  Use one of the avilable subcommands
+to create different objects in the system`,
 }
 
 func init() {
 	rootCmd.AddCommand(createCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// createCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// createCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

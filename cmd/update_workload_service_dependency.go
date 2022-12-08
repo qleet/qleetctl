@@ -1,92 +1,56 @@
 /*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
+Copyright © 2023 Qleet admin@qleet.io
 */
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 
 	"github.com/spf13/cobra"
-	tpclient "github.com/threeport/threeport-go-client"
-	tpapi "github.com/threeport/threeport-rest-api/pkg/api/v0"
 	"gopkg.in/yaml.v2"
 
-	"github.com/qleet/qleetctl/internal/config"
+	"github.com/qleet/qleetctl/internal/api"
+	qout "github.com/qleet/qleetctl/internal/output"
 )
 
-var wsdUpdateConfigPath string
+var updateWorkloadServiceDependencyConfigPath string
 
 // updateWorkloadServiceDependencyCmd represents the workload-service-dependency command
 var updateWorkloadServiceDependencyCmd = &cobra.Command{
-	Use:   "workload-service-dependency",
-	Short: "Update a new workload service dependency",
-	Long:  `Update a new workload service dependency.`,
+	Use:          "workload-service-dependency",
+	Example:      "qleetctl update workload-servicde-dependency -c /path/to/config.yaml",
+	Short:        "Update a new workload service dependency",
+	Long:         `Update a new workload service dependency.`,
+	SilenceUsage: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		// load config
-		configContent, err := ioutil.ReadFile(wsdUpdateConfigPath)
+		configContent, err := ioutil.ReadFile(updateWorkloadServiceDependencyConfigPath)
 		if err != nil {
-			panic(err)
+			qout.Error("failed to read config file", err)
+			os.Exit(1)
 		}
-		var workloadServiceDependencyConfig config.WorkloadServiceDependencyConfig
-		if err := yaml.Unmarshal(configContent, &workloadServiceDependencyConfig); err != nil {
-			panic(err)
+		var workloadServiceDependency api.WorkloadServiceDependencyConfig
+		if err := yaml.Unmarshal(configContent, &workloadServiceDependency); err != nil {
+			qout.Error("failed to unmarshal config file yaml content", err)
+			os.Exit(1)
 		}
 
-		// get workload instance by name
-		workloadInstance, err := tpclient.GetWorkloadInstanceByName(
-			workloadServiceDependencyConfig.WorkloadInstanceName,
-			"http://localhost:1323", "",
-		)
+		// update workload service dependency
+		wsd, err := workloadServiceDependency.Update()
 		if err != nil {
-			panic(err)
+			qout.Error("failed to update workload", err)
+			os.Exit(1)
 		}
 
-		// construct workload service dependency object
-		workloadServiceDependency := &tpapi.WorkloadServiceDependency{
-			Name:               &workloadServiceDependencyConfig.Name,
-			UpstreamHost:       &workloadServiceDependencyConfig.UpstreamHost,
-			UpstreamPath:       &workloadServiceDependencyConfig.UpstreamPath,
-			WorkloadInstanceID: &workloadInstance.ID,
-		}
-
-		// get existing workload service dependency by name to retrieve its ID
-		existingWSD, err := tpclient.GetWorkloadServiceDependencyByName(
-			workloadServiceDependencyConfig.Name,
-			"http://localhost:1323", "",
-		)
-		if err != nil {
-			panic(err)
-		}
-
-		// update workload instance in API
-		wsdJSON, err := json.Marshal(&workloadServiceDependency)
-		if err != nil {
-			panic(err)
-		}
-		wsd, err := tpclient.UpdateWorkloadServiceDependency(existingWSD.ID, wsdJSON, "http://localhost:1323", "")
-		if err != nil {
-			panic(err)
-		}
-
-		fmt.Printf("workload service dependency %s updated\n", *wsd.Name)
+		qout.Complete(fmt.Sprintf("workload service dependency %s updated\n", *wsd.Name))
 	},
 }
 
 func init() {
 	updateCmd.AddCommand(updateWorkloadServiceDependencyCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// updateWorkloadServiceDependencyCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// updateWorkloadServiceDependencyCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	updateWorkloadServiceDependencyCmd.Flags().StringVarP(&wsdUpdateConfigPath, "config", "c", "", "path to file with workload service dependency config")
+	updateWorkloadServiceDependencyCmd.Flags().StringVarP(&updateWorkloadServiceDependencyConfigPath, "config", "c", "", "path to file with workload service dependency config")
 	updateWorkloadServiceDependencyCmd.MarkFlagRequired("config")
 }

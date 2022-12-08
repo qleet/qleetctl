@@ -1,6 +1,5 @@
 /*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
+Copyright © 2023 Qleet admin@qleet.io
 */
 package cmd
 
@@ -31,9 +30,6 @@ var rootCmd = &cobra.Command{
 	Long: `Qleet OS is a global control plane for your software.  The qleetctl
 CLI installs and manages instances of the QleetOS control plane as well as
 applications that are deployed into the QleetOS compute space.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

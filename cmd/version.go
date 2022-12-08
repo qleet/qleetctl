@@ -1,6 +1,5 @@
 /*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
+Copyright © 2023 Qleet admin@qleet.io
 */
 package cmd
 
@@ -20,7 +19,7 @@ var versionCmd = &cobra.Command{
 	Short: "Print the version of qleetctl",
 	Long:  `Print the version of qleetctl.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(version)
+		fmt.Printf("Version: %s", version)
 	},
 }
 

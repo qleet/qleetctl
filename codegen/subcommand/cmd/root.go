@@ -137,7 +137,7 @@ import (
 {{- if .LoadConfig }}
 	"gopkg.in/yaml.v2"
 
-	"github.com/qleet/qleetctl/internal/config"
+	"github.com/qleet/qleetctl/internal/api"
 	qout "github.com/qleet/qleetctl/internal/output"
 {{- end }}
 )
@@ -165,7 +165,7 @@ var {{ .LowerCamelParent }}{{ .CamelName }}Cmd = &cobra.Command{
 			qout.Error("failed to read config file", err)
 			os.Exit(1)
 		}
-		var {{ .LowerCamelName }} config.{{ .CamelName }}Config
+		var {{ .LowerCamelName }} api.{{ .CamelName }}Config
 		if err := yaml.Unmarshal(configContent, &{{ .LowerCamelName }}); err != nil {
 			qout.Error("failed to unmarshal config file yaml content", err)
 			os.Exit(1)
