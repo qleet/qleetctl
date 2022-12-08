@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
+	"github.com/qleet/qleetctl/internal/install"
 	tpclient "github.com/threeport/threeport-go-client"
 	tpapi "github.com/threeport/threeport-rest-api/pkg/api/v0"
 )
 
+// WorkloadConfig contains the attributes needed to manage a workload.
 type WorkloadConfig struct {
 	Name                      string                          `yaml:"Name"`
 	WorkloadDefinition        WorkloadDefinitionConfig        `yaml:"WorkloadDefinition"`
@@ -15,18 +17,24 @@ type WorkloadConfig struct {
 	WorkloadServiceDependency WorkloadServiceDependencyConfig `yaml:"WorkloadServiceDependency"`
 }
 
+// WorkloadDefinitionConfig contains the attributes needed to manage a workload
+// definition.
 type WorkloadDefinitionConfig struct {
 	Name         string `yaml:"Name"`
 	YAMLDocument string `yaml:"YAMLDocument"`
 	UserID       uint   `yaml:"UserID"`
 }
 
+// WorkloadInstanceConfig contains the attributes needed to manage a workload
+// instance.
 type WorkloadInstanceConfig struct {
 	Name                   string `yaml:"Name"`
 	WorkloadClusterName    string `yaml:"WorkloadClusterName"`
 	WorkloadDefinitionName string `yaml:"WorkloadDefinitionName"`
 }
 
+// WorkloadServiceDependencyConfig contains the attributes needed to manage a
+// workload service dependency.
 type WorkloadServiceDependencyConfig struct {
 	Name                 string `yaml:"Name"`
 	UpstreamHost         string `yaml:"UpstreamHost"`
@@ -34,6 +42,7 @@ type WorkloadServiceDependencyConfig struct {
 	WorkloadInstanceName string `yaml:"WorkloadInstanceName"`
 }
 
+// Create creates a workload in the QleetOS API.
 func (wc *WorkloadConfig) Create() error {
 	// create the definition
 	_, aerr := wc.WorkloadDefinition.Create()
@@ -56,6 +65,7 @@ func (wc *WorkloadConfig) Create() error {
 	return nil
 }
 
+// Create creates a workload definition in the QleetOS API.
 func (wdc *WorkloadDefinitionConfig) Create() (*tpapi.WorkloadDefinition, error) {
 	// get the content of the yaml document
 	definitionContent, err := ioutil.ReadFile(wdc.YAMLDocument)
@@ -76,7 +86,7 @@ func (wdc *WorkloadDefinitionConfig) Create() (*tpapi.WorkloadDefinition, error)
 	if err != nil {
 		return nil, err
 	}
-	wd, err := tpclient.CreateWorkloadDefinition(wdJSON, "http://localhost:1323", "")
+	wd, err := tpclient.CreateWorkloadDefinition(wdJSON, install.GetQleetOSAPIEndpoint(), "")
 	if err != nil {
 		return nil, err
 	}
@@ -84,11 +94,12 @@ func (wdc *WorkloadDefinitionConfig) Create() (*tpapi.WorkloadDefinition, error)
 	return wd, nil
 }
 
+// Create creates a workload instance in the QleetOS API.
 func (wic *WorkloadInstanceConfig) Create() (*tpapi.WorkloadInstance, error) {
 	// get workload cluster by name
 	workloadCluster, err := tpclient.GetWorkloadClusterByName(
 		wic.WorkloadClusterName,
-		"http://localhost:1323", "",
+		install.GetQleetOSAPIEndpoint(), "",
 	)
 	if err != nil {
 		return nil, err
@@ -97,7 +108,7 @@ func (wic *WorkloadInstanceConfig) Create() (*tpapi.WorkloadInstance, error) {
 	// get workload definition by name
 	workloadDefinition, err := tpclient.GetWorkloadDefinitionByName(
 		wic.WorkloadDefinitionName,
-		"http://localhost:1323", "",
+		install.GetQleetOSAPIEndpoint(), "",
 	)
 	if err != nil {
 		return nil, err
@@ -115,7 +126,7 @@ func (wic *WorkloadInstanceConfig) Create() (*tpapi.WorkloadInstance, error) {
 	if err != nil {
 		return nil, err
 	}
-	wi, err := tpclient.CreateWorkloadInstance(wiJSON, "http://localhost:1323", "")
+	wi, err := tpclient.CreateWorkloadInstance(wiJSON, install.GetQleetOSAPIEndpoint(), "")
 	if err != nil {
 		return nil, err
 	}
@@ -123,11 +134,12 @@ func (wic *WorkloadInstanceConfig) Create() (*tpapi.WorkloadInstance, error) {
 	return wi, nil
 }
 
+// Create creates a workload service dependency in the QleetOS API.
 func (wsdc *WorkloadServiceDependencyConfig) Create() (*tpapi.WorkloadServiceDependency, error) {
 	// get workload instance by name
 	workloadInstance, err := tpclient.GetWorkloadInstanceByName(
 		wsdc.WorkloadInstanceName,
-		"http://localhost:1323", "",
+		install.GetQleetOSAPIEndpoint(), "",
 	)
 	if err != nil {
 		return nil, err
@@ -146,7 +158,7 @@ func (wsdc *WorkloadServiceDependencyConfig) Create() (*tpapi.WorkloadServiceDep
 	if err != nil {
 		return nil, err
 	}
-	wsd, err := tpclient.CreateWorkloadServiceDependency(wsdJSON, "http://localhost:1323", "")
+	wsd, err := tpclient.CreateWorkloadServiceDependency(wsdJSON, install.GetQleetOSAPIEndpoint(), "")
 	if err != nil {
 		return nil, err
 	}
@@ -154,11 +166,12 @@ func (wsdc *WorkloadServiceDependencyConfig) Create() (*tpapi.WorkloadServiceDep
 	return wsd, nil
 }
 
+// Update updates a workload service dependency in the QleetOS API.
 func (wsdc *WorkloadServiceDependencyConfig) Update() (*tpapi.WorkloadServiceDependency, error) {
 	// get workload instance by name
 	workloadInstance, err := tpclient.GetWorkloadInstanceByName(
 		wsdc.WorkloadInstanceName,
-		"http://localhost:1323", "",
+		install.GetQleetOSAPIEndpoint(), "",
 	)
 	if err != nil {
 		return nil, err
@@ -175,7 +188,7 @@ func (wsdc *WorkloadServiceDependencyConfig) Update() (*tpapi.WorkloadServiceDep
 	// get existing workload service dependency by name to retrieve its ID
 	existingWSD, err := tpclient.GetWorkloadServiceDependencyByName(
 		wsdc.Name,
-		"http://localhost:1323", "",
+		install.GetQleetOSAPIEndpoint(), "",
 	)
 	if err != nil {
 		return nil, err
@@ -189,7 +202,7 @@ func (wsdc *WorkloadServiceDependencyConfig) Update() (*tpapi.WorkloadServiceDep
 	wsd, err := tpclient.UpdateWorkloadServiceDependency(
 		existingWSD.ID,
 		wsdJSON,
-		"http://localhost:1323", "",
+		install.GetQleetOSAPIEndpoint(), "",
 	)
 	if err != nil {
 		return nil, err

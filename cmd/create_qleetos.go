@@ -11,14 +11,21 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/qleet/qleetctl/internal/provider"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	tpclient "github.com/threeport/threeport-go-client"
 	tpapi "github.com/threeport/threeport-rest-api/pkg/api/v0"
 	kubeclient "k8s.io/client-go/tools/clientcmd"
 
+	"github.com/qleet/qleetctl/internal/config"
 	"github.com/qleet/qleetctl/internal/install"
 	qout "github.com/qleet/qleetctl/internal/output"
+	"github.com/qleet/qleetctl/internal/provider"
+)
+
+var (
+	createQleetOSInstanceName string
+	forceOverwriteConfig      bool
 )
 
 // createQleetosCmd represents the create qleetos command
@@ -29,6 +36,29 @@ var createQleetosCmd = &cobra.Command{
 	Long:         `Create a new instance of the QleetOS control plane.`,
 	SilenceUsage: true,
 	Run: func(cmd *cobra.Command, args []string) {
+		// get qleet config
+		qleetConfig := &config.QleetConfig{}
+		if err := viper.Unmarshal(qleetConfig); err != nil {
+			qout.Error("failed to get Qleet config", err)
+		}
+
+		// check qleet config for exisiting instance
+		qleetOSInstanceConfigExists := false
+		for _, instance := range qleetConfig.QleetOSInstances {
+			if instance.Name == createQleetOSInstanceName {
+				qleetOSInstanceConfigExists = true
+				if !forceOverwriteConfig {
+					qout.Error(
+						"interupted creation of QleetOS instance",
+						errors.New(fmt.Sprintf("instance of QleetOS with name %s already exists", instance.Name)),
+					)
+					qout.Info("if you wish to overwrite the existing config use --force-overwrite-config flag")
+					qout.Warning("you will lose the ability to connect to the existing QleetOS instance if it still exists")
+					os.Exit(1)
+				}
+			}
+		}
+
 		// write kind config file to /tmp directory
 		configFile, err := os.Create(provider.QleetKindConfigPath)
 		if err != nil {
@@ -36,7 +66,7 @@ var createQleetosCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		defer configFile.Close()
-		configFile.WriteString(provider.KindConfig())
+		configFile.WriteString(provider.KindConfig(createQleetOSInstanceName))
 		qout.Info("kind config written to /tmp directory")
 
 		// start kind cluster
@@ -216,19 +246,43 @@ var createQleetosCmd = &cobra.Command{
 			qout.Error("failed to marshal workload cluster to json", err)
 			os.Exit(1)
 		}
-		wc, err := tpclient.CreateWorkloadCluster(wcJSON, "http://localhost:1323", "")
+		wc, err := tpclient.CreateWorkloadCluster(wcJSON, install.GetQleetOSAPIEndpoint(), "")
 		if err != nil {
 			qout.Error("failed to create workload cluster in Qleet API", err)
 			os.Exit(1)
 		}
 		qout.Info(fmt.Sprintf("default workload cluster %s for compute space set up", *wc.Name))
 
-		qout.Complete("QleetOS control plane ready to use")
+		// create qleet config for new instance
+		newQleetOSInstance := &config.QleetOSInstance{
+			Name:      createQleetOSInstanceName,
+			APIServer: install.GetQleetOSAPIEndpoint(),
+		}
+
+		// update qleet config to add the new instance and current instance
+		if qleetOSInstanceConfigExists {
+			for n, instance := range qleetConfig.QleetOSInstances {
+				if instance.Name == createQleetOSInstanceName {
+					qleetConfig.QleetOSInstances[n] = *newQleetOSInstance
+				}
+			}
+		} else {
+			qleetConfig.QleetOSInstances = append(qleetConfig.QleetOSInstances, *newQleetOSInstance)
+		}
+		viper.Set("QleetOSInstances", qleetConfig.QleetOSInstances)
+		viper.Set("CurrentInstance", createQleetOSInstanceName)
+		viper.WriteConfig()
+		qout.Info("Qleet config updated")
+
+		qout.Complete("QleetOS instance created")
 	},
 }
 
 func init() {
 	createCmd.AddCommand(createQleetosCmd)
 
-	createQleetosCmd.Flags().StringP("provider", "p", "kind", "The infrasture tool or provider to install upon")
+	createQleetosCmd.Flags().StringP("provider", "p", "kind", "the infrasture provider to install upon")
+	createQleetosCmd.Flags().StringVarP(&createQleetOSInstanceName, "name", "n", "", "name of Qleet OS instance")
+	createQleetosCmd.MarkFlagRequired("name")
+	createQleetosCmd.Flags().BoolVar(&forceOverwriteConfig, "force-overwrite-config", false, "force the overwrite of an existing QleetOS instance with the same name in Qleet config")
 }
