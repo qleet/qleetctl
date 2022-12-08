@@ -2,3 +2,4 @@ qleetctl
 .idea/
 dist/
 completions/
+bin/
