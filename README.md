@@ -26,7 +26,7 @@ VERSION=$(curl -sL https://github.com/qleet/qleetctl/releases/ | xmllint -html -
 ```
 or a specific version
 ```bash
-VERSION=v0.1.9
+VERSION=v0.1.15
 ```
 download and install prebuilt binaries
 ```bash
@@ -54,7 +54,7 @@ Set `VERSION` to
     ```
 * or a specific version
     ```bash
-    VERSION=v0.1.9
+    VERSION=v0.1.15
     ```
 download and install package
 ```bash
@@ -71,7 +71,7 @@ Set `VERSION` to
     ```
 * or a specific version
     ```bash
-    VERSION=v0.1.9
+    VERSION=v0.1.15
     ```
 download and install package
 ```bash
@@ -88,7 +88,7 @@ Set `VERSION` to
     ```
 * or a specific version
     ```bash
-    VERSION=v0.1.9
+    VERSION=v0.1.15
     ```
 download and install package
 ```bash
