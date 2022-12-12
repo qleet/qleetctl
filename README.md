@@ -58,7 +58,7 @@ Set `VERSION` to
     ```
 download and install package
 ```bash
-TEMP_PACKAGE="$(mktemp)" && wget -O "$TEMP_PACKAGE" "https://github.com/qleet/qleetctl/releases/download/${VERSION}/qleetctl_${VERSION}_$(uname -m | sed -E 's/^(aarch64|aarch64_be|armv6l|armv7l|armv8b|armv8l)$$/arm64/g' | sed -E 's/^x86_64$$/amd64/g').deb" && sudo dpkg -i "$TEMP_PACKAGE"
+TEMP_PACKAGE="$(mktemp)" && wget -O "$TEMP_PACKAGE" "https://github.com/qleet/qleetctl/releases/download/${VERSION}/qleetctl_${VERSION}_$(uname -m | sed -E 's/^(aarch64|aarch64_be|armv6l|armv7l|armv8b|armv8l)$$/arm64/g' | sed -E 's/^x86_64$$/amd64/g').deb" && sudo apt -i "$TEMP_PACKAGE"
 rm -f "$TEMP_PACKAGE"
 ```
 
