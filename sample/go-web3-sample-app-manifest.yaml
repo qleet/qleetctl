@@ -9,7 +9,7 @@ metadata:
   name: go-web3-sample-app-config
   namespace: go-web3-sample-app
 data:
-  RPCENDPOINT: https://forward-proxy.forward-proxy-system.svc.cluster.local
+  RPCENDPOINT: http://forward-proxy.forward-proxy-system.svc.cluster.local
 ---
 apiVersion: apps/v1
 kind: Deployment

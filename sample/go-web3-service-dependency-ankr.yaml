@@ -1,0 +1,5 @@
+Name: "go-web3-sample-app-service"
+UpstreamHost: "rpc.ankr.com"
+UpstreamPath: "/eth"
+WorkloadInstanceName: "go-web3-sample-app-instance"
+

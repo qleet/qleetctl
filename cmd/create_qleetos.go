@@ -23,6 +23,14 @@ import (
 	"github.com/qleet/qleetctl/internal/provider"
 )
 
+const (
+	defaultComputeClusterName          string = "default-qleet-compute-space"
+	defaultComputeClusterRegion               = "local"
+	defaultComputeClusterProvider             = "kind"
+	defaultComputeClusterAPIEndpoint          = "kubernetes.default"
+	forwardProxyWorkloadDefinitionName        = "forwardProxy"
+)
+
 var (
 	createQleetOSInstanceName string
 	forceOverwriteConfig      bool
@@ -228,15 +236,15 @@ var createQleetosCmd = &cobra.Command{
 		}
 
 		// setup default compute space cluster
-		clusterName := "default-qleet-compute-space"
-		clusterRegion := "local"
-		clusterProvider := "kind"
-		server := "kubernetes.default"
+		defaultClusterName := defaultComputeClusterName
+		defaultClusterRegion := defaultComputeClusterRegion
+		defaultClusterProvider := defaultComputeClusterProvider
+		defaultClusterAPIEndpoint := defaultComputeClusterAPIEndpoint
 		workloadCluster := tpapi.WorkloadCluster{
-			Name:          &clusterName,
-			Region:        &clusterRegion,
-			Provider:      &clusterProvider,
-			APIEndpoint:   &server,
+			Name:          &defaultClusterName,
+			Region:        &defaultClusterRegion,
+			Provider:      &defaultClusterProvider,
+			APIEndpoint:   &defaultClusterAPIEndpoint,
 			CACertificate: &caCert,
 			Certificate:   &cert,
 			Key:           &key,
@@ -253,13 +261,36 @@ var createQleetosCmd = &cobra.Command{
 		}
 		qout.Info(fmt.Sprintf("default workload cluster %s for compute space set up", *wc.Name))
 
+		// TODO: add superuser
+		superuserID := uint(1)
+
+		// add forward proxy definition
+		fwdProxyDefName := forwardProxyWorkloadDefinitionName
+		fwdProxyYAML := install.ForwardProxyManifest()
+		fwdProxyWorkloadDefinition := tpapi.WorkloadDefinition{
+			Name:         &fwdProxyDefName,
+			YAMLDocument: &fwdProxyYAML,
+			UserID:       &superuserID,
+		}
+		fpwdJSON, err := json.Marshal(&fwdProxyWorkloadDefinition)
+		if err != nil {
+			qout.Error("failed to marshal forward proxy workload definition to json", err)
+			os.Exit(1)
+		}
+		fpwd, err := tpclient.CreateWorkloadDefinition(fpwdJSON, install.GetQleetOSAPIEndpoint(), "")
+		if err != nil {
+			qout.Error("failed to create forward proxy workload definition in Qleet API", err)
+			os.Exit(1)
+		}
+		qout.Info(fmt.Sprintf("forward proxy workload definition %s added", *fpwd.Name))
+
 		// create qleet config for new instance
 		newQleetOSInstance := &config.QleetOSInstance{
 			Name:      createQleetOSInstanceName,
 			APIServer: install.GetQleetOSAPIEndpoint(),
 		}
 
-		// update qleet config to add the new instance and current instance
+		// update qleet config to add the new instance and set as current instance
 		if qleetOSInstanceConfigExists {
 			for n, instance := range qleetConfig.QleetOSInstances {
 				if instance.Name == createQleetOSInstanceName {
