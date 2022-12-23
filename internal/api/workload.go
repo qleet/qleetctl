@@ -117,8 +117,8 @@ func (wic *WorkloadInstanceConfig) Create() (*tpapi.WorkloadInstance, error) {
 	// construct workload instance object
 	workloadInstance := &tpapi.WorkloadInstance{
 		Name:                 &wic.Name,
-		WorkloadClusterID:    &workloadCluster.ID,
-		WorkloadDefinitionID: &workloadDefinition.ID,
+		WorkloadClusterID:    workloadCluster.ID,
+		WorkloadDefinitionID: workloadDefinition.ID,
 	}
 
 	// create workload instance in API
@@ -150,7 +150,7 @@ func (wsdc *WorkloadServiceDependencyConfig) Create() (*tpapi.WorkloadServiceDep
 		Name:               &wsdc.Name,
 		UpstreamHost:       &wsdc.UpstreamHost,
 		UpstreamPath:       &wsdc.UpstreamPath,
-		WorkloadInstanceID: &workloadInstance.ID,
+		WorkloadInstanceID: workloadInstance.ID,
 	}
 
 	// create workload instance in API
@@ -182,7 +182,7 @@ func (wsdc *WorkloadServiceDependencyConfig) Update() (*tpapi.WorkloadServiceDep
 		Name:               &wsdc.Name,
 		UpstreamHost:       &wsdc.UpstreamHost,
 		UpstreamPath:       &wsdc.UpstreamPath,
-		WorkloadInstanceID: &workloadInstance.ID,
+		WorkloadInstanceID: workloadInstance.ID,
 	}
 
 	// get existing workload service dependency by name to retrieve its ID
@@ -200,7 +200,7 @@ func (wsdc *WorkloadServiceDependencyConfig) Update() (*tpapi.WorkloadServiceDep
 		return nil, err
 	}
 	wsd, err := tpclient.UpdateWorkloadServiceDependency(
-		existingWSD.ID,
+		*existingWSD.ID,
 		wsdJSON,
 		install.GetQleetOSAPIEndpoint(), "",
 	)

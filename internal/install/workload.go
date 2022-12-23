@@ -4,6 +4,7 @@ import "fmt"
 
 const (
 	WorkloadControllerManifestPath = "/tmp/qleet-workload-controller.yaml"
+	WorkloadControllerImage        = "ghcr.io/threeport/threeport-workload-controller:v0.1.3"
 )
 
 // WorkloadControllerManifest returns a yaml manifest for the workload controller
@@ -38,10 +39,10 @@ spec:
     spec:
       containers:
       - name: workload-controller
-        image: lander2k2/threeport-workload-controller:latest
+        image: %[2]s
         imagePullPolicy: IfNotPresent
         envFrom:
           - secretRef:
               name: workload-controller-config
-`, ThreeportControlPlaneNs)
+`, ThreeportControlPlaneNs, WorkloadControllerImage)
 }

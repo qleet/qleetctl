@@ -8,8 +8,8 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.14.0
-	github.com/threeport/threeport-go-client v1.1.4
-	github.com/threeport/threeport-rest-api v1.1.3
+	github.com/threeport/threeport-go-client v1.1.9
+	github.com/threeport/threeport-rest-api v1.1.7
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/client-go v0.26.0
 )
