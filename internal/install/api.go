@@ -9,6 +9,12 @@ const (
 	QleetOSAPIProtocol      = "http"
 	QleetOSAPIHostname      = "localhost"
 	QleetOSAPIPort          = "1323"
+	PostgresImage           = "postgres:15-alpine"
+	NATSBoxImage            = "natsio/nats-box:0.13.3"
+	NATSServerImage         = "nats:2.9-alpine"
+	NATSConfigReloaderImage = "natsio/nats-server-config-reloader:0.7.4"
+	NATSPromExporterImage   = "natsio/prometheus-nats-exporter:0.10.1"
+	ThreeportRESTAPIImage   = "ghcr.io/threeport/threeport-rest-api:v1.1.7"
 )
 
 // GetQleetOSAPIEndpoint returns the QleetOS API endpoint
@@ -57,7 +63,7 @@ spec:
     spec:
       containers:
         - name: postgres
-          image: postgres:14.3-alpine
+          image: %[2]s
           imagePullPolicy: "IfNotPresent"
           ports:
             - containerPort: 5432
@@ -219,7 +225,7 @@ spec:
       volumes:
       containers:
       - name: nats-box
-        image: natsio/nats-box:0.13.2
+        image: %[3]s
         imagePullPolicy: IfNotPresent
         resources:
           null
@@ -295,7 +301,7 @@ spec:
       terminationGracePeriodSeconds: 60
       containers:
       - name: nats
-        image: nats:2.9.3-alpine
+        image: %[4]s
         imagePullPolicy: IfNotPresent
         resources:
           {}
@@ -388,7 +394,7 @@ spec:
       #                               #
       #################################
       - name: reloader
-        image: natsio/nats-server-config-reloader:0.7.4
+        image: %[5]s
         imagePullPolicy: IfNotPresent
         resources:
           null
@@ -410,7 +416,7 @@ spec:
       #                            #
       ##############################
       - name: metrics
-        image: natsio/prometheus-nats-exporter:0.10.0
+        image: %[6]s
         imagePullPolicy: IfNotPresent
         resources:
           {}
@@ -462,7 +468,8 @@ spec:
       [ $name = test ]
 
   restartPolicy: Never
-`, ThreeportControlPlaneNs)
+`, ThreeportControlPlaneNs, PostgresImage, NATSBoxImage, NATSServerImage,
+		NATSConfigReloaderImage, NATSPromExporterImage)
 }
 
 // APIServerManifest returns a yaml manifest for the threeport API with the
@@ -502,7 +509,7 @@ spec:
     spec:
       containers:
       - name: api-server
-        image: lander2k2/threeport-rest-api:latest
+        image: %[3]s
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: %[2]s
@@ -530,5 +537,5 @@ spec:
     port: 80
     protocol: TCP
     targetPort: %[2]s
-`, ThreeportControlPlaneNs, QleetOSAPIPort)
+`, ThreeportControlPlaneNs, QleetOSAPIPort, ThreeportRESTAPIImage)
 }

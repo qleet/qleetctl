@@ -180,7 +180,7 @@ var createQleetosCmd = &cobra.Command{
 		qout.Info("QleetOS workload controller created")
 
 		// wait a few seconds for everything to come up
-		qout.Info("waiting for components to spin up...")
+		qout.Info("waiting for control plane components to spin up...")
 		time.Sleep(time.Second * 200)
 
 		// get kubeconfig
